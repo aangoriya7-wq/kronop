@@ -118,6 +118,11 @@ export default function ProfileScreen() {
     router.push('/verification');
   };
 
+  const handleSupporterPress = () => {
+    // Open help center which uses GroqAIService
+    router.push('/help-center');
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'video':
@@ -178,7 +183,7 @@ export default function ProfileScreen() {
           <Text style={styles.username}>Your Profile</Text>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleSupporterPress}>
             <FontAwesome6 name="headset" size={20} color="#FFFFFF" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={handleVerificationPress}>
