@@ -1,0 +1,85 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-file
+
+# Bundle size optimization
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production
+build/
+dist/
+
+# Expo
+.expo/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation (exclude from bundle)
+*.md
+!README.md
+
+# Unused assets
+assets/unused/
+assets/temp/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Temporary files
+tmp/
+temp/
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# Project specific
+app-example
+node_modules/
+config/firebase-admin.json
+ngrok.exe
+google-services.json
+GoogleService-Info.plist
+
+# Metro bundler fix - ignore non-existent upload Bridge folder
+upload Bridge/
+components/upload Bridge/

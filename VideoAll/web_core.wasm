@@ -1,0 +1,371 @@
+// WebAssembly - Browser core
+// High-performance video player for web browsers
+// Uses Emscripten to compile C++ to WASM
+
+#include <emscripten.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Video player state
+typedef struct {
+    uint8_t* video_buffer;
+    uint32_t buffer_width;
+    uint32_t buffer_height;
+    uint32_t buffer_size;
+    uint32_t current_frame;
+    double fps;
+    uint8_t is_playing;
+    uint8_t is_loaded;
+    
+    // Performance metrics
+    uint32_t frames_decoded;
+    uint32_t total_decode_time;
+    uint32_t last_frame_time;
+    double average_fps;
+} VideoPlayerWASM;
+
+// Global player instance
+static VideoPlayerWASM player = {0};
+
+// Memory management functions
+EMSCRIPTEN_KEEPALIVE
+void* wasm_malloc(size_t size) {
+    return malloc(size);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void wasm_free(void* ptr) {
+    free(ptr);
+}
+
+// Core video functions
+EMSCRIPTEN_KEEPALIVE
+int init_video_player(uint32_t width, uint32_t height) {
+    printf("🎮 Initializing WASM Video Player: %dx%d\n", width, height);
+    
+    // Allocate video buffer
+    player.buffer_size = width * height * 4; // RGBA
+    player.video_buffer = (uint8_t*)wasm_malloc(player.buffer_size);
+    
+    if (!player.video_buffer) {
+        printf("❌ Failed to allocate video buffer\n");
+        return -1;
+    }
+    
+    player.buffer_width = width;
+    player.buffer_height = height;
+    player.current_frame = 0;
+    player.fps = 60.0;
+    player.is_playing = 0;
+    player.is_loaded = 0;
+    player.frames_decoded = 0;
+    player.total_decode_time = 0;
+    player.average_fps = 0.0;
+    
+    printf("✅ WASM Video Player initialized\n");
+    return 0;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int load_video_data(const char* url, const uint8_t* data, uint32_t size) {
+    printf("📹 Loading video: %s (%d bytes)\n", url, size);
+    
+    if (!data || size == 0) {
+        printf("❌ Invalid video data\n");
+        return -1;
+    }
+    
+    // Copy data to buffer (simplified - in production would decode video)
+    if (size <= player.buffer_size) {
+        memcpy(player.video_buffer, data, size);
+        player.is_loaded = 1;
+        printf("✅ Video data loaded successfully\n");
+        return 0;
+    } else {
+        printf("❌ Video data too large for buffer\n");
+        return -1;
+    }
+}
+
+EMSCRIPTEN_KEEPALIVE
+void play_video() {
+    if (!player.is_loaded) {
+        printf("❌ No video loaded\n");
+        return;
+    }
+    
+    player.is_playing = 1;
+    printf("▶️  Playing video (WASM)\n");
+    
+    // Start playback loop
+    emscripten_async_call(playback_loop, NULL, NULL);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void pause_video() {
+    player.is_playing = 0;
+    printf("⏸️  Video paused (WASM)\n");
+}
+
+EMSCRIPTEN_KEEPALIVE
+void stop_video() {
+    player.is_playing = 0;
+    player.current_frame = 0;
+    printf("⏹️  Video stopped (WASM)\n");
+}
+
+EMSCRIPTEN_KEEPALIVE
+void set_fps(double target_fps) {
+    player.fps = target_fps;
+    printf("🎬 FPS set to: %.1f\n", target_fps);
+}
+
+// Playback loop (runs in Web Worker)
+EMSCRIPTEN_KEEPALIVE
+void playback_loop() {
+    if (!player.is_playing) {
+        return;
+    }
+    
+    uint32_t start_time = emscripten_get_now();
+    
+    // Simulate video playback
+    while (player.is_playing) {
+        uint32_t frame_start = emscripten_get_now();
+        
+        // Process frame (simplified)
+        process_frame();
+        player.current_frame++;
+        player.frames_decoded++;
+        
+        // Calculate FPS
+        uint32_t frame_time = emscripten_get_now() - frame_start;
+        player.total_decode_time += frame_time;
+        
+        if (player.frames_decoded > 0) {
+            player.average_fps = (double)player.frames_decoded / ((double)player.total_decode_time / 1000.0);
+        }
+        
+        // Log performance every 60 frames
+        if (player.current_frame % 60 == 0) {
+            printf("🎬 Frame: %d, FPS: %.1f\n", player.current_frame, player.average_fps);
+        }
+        
+        // Target frame rate timing
+        double target_frame_time = 1000.0 / player.fps;
+        if (frame_time < target_frame_time) {
+            emscripten_sleep(target_frame_time - frame_time);
+        }
+    }
+}
+
+EMSCRIPTEN_KEEPALIVE
+void process_frame() {
+    // Simulate frame processing
+    // In production, this would:
+    // 1. Decode video frame
+    // 2. Apply filters/effects
+    // 3. Convert to display format
+    // 4. Update texture
+    
+    // Simple frame animation for demo
+    uint32_t pixel_count = player.buffer_width * player.buffer_height;
+    for (uint32_t i = 0; i < pixel_count; i += 4) {
+        uint32_t index = (player.current_frame * 4 + i) % 256;
+        uint8_t value = (uint8_t)(index);
+        
+        if (i + 3 < pixel_count) {
+            player.video_buffer[i] = value;
+            player.video_buffer[i + 1] = value + 50;
+            player.video_buffer[i + 2] = value + 100;
+            player.video_buffer[i + 3] = value + 150;
+        }
+    }
+}
+
+// Getters for JavaScript integration
+EMSCRIPTEN_KEEPALIVE
+uint8_t* get_video_buffer() {
+    return player.video_buffer;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint32_t get_buffer_width() {
+    return player.buffer_width;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint32_t get_buffer_height() {
+    return player.buffer_height;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint32_t get_current_frame() {
+    return player.current_frame;
+}
+
+EMSCRIPTEN_KEEPALIVE
+double get_fps() {
+    return player.average_fps;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint8_t is_playing() {
+    return player.is_playing;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint8_t is_loaded() {
+    return player.is_loaded;
+}
+
+// Performance metrics
+EMSCRIPTEN_KEEPALIVE
+uint32_t get_frames_decoded() {
+    return player.frames_decoded;
+}
+
+EMSCRIPTEN_KEEPALIVE
+double get_average_fps() {
+    return player.average_fps;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void reset_performance_metrics() {
+    player.frames_decoded = 0;
+    player.total_decode_time = 0;
+    player.average_fps = 0.0;
+    printf("📊 Performance metrics reset\n");
+}
+
+// Cleanup
+EMSCRIPTEN_KEEPALIVE
+void cleanup_video_player() {
+    if (player.video_buffer) {
+        wasm_free(player.video_buffer);
+        player.video_buffer = NULL;
+    }
+    
+    memset(&player, 0, sizeof(VideoPlayerWASM));
+    printf("🗑️  WASM Video Player cleaned up\n");
+}
+
+// Error handling
+EMSCRIPTEN_KEEPALIVE
+const char* get_last_error() {
+    static char error_buffer[256];
+    // In production, would track actual errors
+    snprintf(error_buffer, sizeof(error_buffer), "No errors");
+    return error_buffer;
+}
+
+;; web_core.wasm - WebAssembly core for browser
+;; Gives app-like speed in browser
+
+(module
+    ;; Import JavaScript functions
+    (import "js" "getVideoData" (func $getVideoData (param i32 i32) (result i32)))
+    (import "js" "renderFrame" (func $renderFrame (param i32 i32 i32)))
+    (import "js" "updateProgress" (func $updateProgress (param f64)))
+    
+    ;; Memory declaration
+    (memory (export "memory") 1)
+    
+    ;; Global variables
+    (global $width (mut i32) (i32.const 1920))
+    (global $height (mut i32) (i32.const 1080))
+    (global $currentFrame (mut i32) (i32.const 0))
+    (global $totalFrames (mut i32) (i32.const 0))
+    (global $fps (mut f32) (f32.const 30.0))
+    
+    ;; Initialize player
+    (func (export "initPlayer") (param $w i32) (param $h i32) (param $total i32)
+        global.set $width
+        global.set $height
+        global.set $totalFrames
+    )
+    
+    ;; Decode video frame
+    (func (export "decodeFrame") (param $frameNum i32) (param $buffer i32) (result i32)
+        (local $result i32)
+        
+        ;; Call JavaScript to get video data
+        local.get $frameNum
+        local.get $buffer
+        call $getVideoData
+        local.set $result
+        
+        ;; Update progress
+        local.get $frameNum
+        f32.convert_i32_s
+        global.get $totalFrames
+        f32.div
+        f64.promote_f32
+        call $updateProgress
+        
+        local.get $result
+        return
+    )
+    
+    ;; Render frame to canvas
+    (func (export "renderToCanvas") (param $buffer i32) (param $width i32) (param $height i32)
+        local.get $buffer
+        local.get $width
+        local.get $height
+        i32.const 0 ;; canvas ID
+        call $renderFrame
+    )
+    
+    ;; Seek to position
+    (func (export "seek") (param $position f64) (result i32)
+        (local $targetFrame i32)
+        
+        ;; Calculate target frame
+        local.get $position
+        global.get $totalFrames
+        f64.convert_i32_s
+        f64.mul
+        f64.const 1.0
+        f64.div
+        i32.trunc_f64_s
+        local.set $targetFrame
+        
+        ;; Update current frame
+        local.get $targetFrame
+        global.set $currentFrame
+        
+        local.get $targetFrame
+        return
+    )
+    
+    ;; Get current time
+    (func (export "getCurrentTime") (result f64)
+        global.get $currentFrame
+        f64.convert_i32_s
+        global.get $totalFrames
+        f64.convert_i32_s
+        f64.div
+        return
+    )
+    
+    ;; Handle button click
+    (func (export "buttonClick") (param $buttonId i32)
+        (local $buttonName i32)
+        
+        ;; Call JavaScript to handle button
+        local.get $buttonId
+        call $handleButtonClick
+    )
+    
+    ;; Memory efficient buffer management
+    (func (export "allocateBuffer") (param $size i32) (result i32)
+        i32.const 0 ;; Start of memory
+        return
+    )
+    
+    ;; Free buffer
+    (func (export "freeBuffer") (param $ptr i32)
+        ;; No-op for now
+    )
+)

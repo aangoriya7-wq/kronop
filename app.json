@@ -1,0 +1,86 @@
+{
+  "expo": {
+    "main": "expo-router/entry",
+    "name": "Kronop",
+    "slug": "kronop",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.png",
+    "scheme": "kronop",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to personalize content and services.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to personalize content and services."
+      }
+    },
+    "android": {
+      "package": "com.anonymous.kronop",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "splash": {
+            "image": "./assets/images/logo.png",
+            "imageWidth": 200,
+            "resizeMode": "contain",
+            "backgroundColor": "#000000"
+          },
+          "backgroundColor": "#000000"
+        }
+      ],
+      "expo-web-browser",
+      "@react-native-community/datetimepicker",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": ""
+        }
+      ],
+      "expo-asset",
+      "expo-audio",
+      "expo-font",
+      "expo-localization",
+      "expo-mail-composer",
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-video",
+      [
+        "expo-build-properties",
+        {}
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6dc9b76b-95bf-4c94-a09f-e4481b97cac2"
+      }
+    }
+  }
+}

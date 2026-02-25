@@ -1,0 +1,10 @@
+{
+  "video_settings": {
+    "default_quality": "auto",
+    "max_buffer_size_mb": 512
+  },
+  "network_settings": {
+    "max_concurrent_downloads": 10,
+    "chunk_size_bytes": 1048576
+  }
+}

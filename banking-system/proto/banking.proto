@@ -1,0 +1,445 @@
+syntax = "proto3";
+
+package banking;
+
+option go_package = "banking-system/proto";
+option java_package = "com.banking.system";
+option java_multiple_files = true;
+
+// Banking Service Definition
+service BankingService {
+  // User Operations
+  rpc RegisterUser(RegisterUserRequest) returns (UserResponse);
+  rpc LoginUser(LoginUserRequest) returns (LoginResponse);
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  
+  // Account Operations
+  rpc CreateAccount(CreateAccountRequest) returns (AccountResponse);
+  rpc GetAccount(GetAccountRequest) returns (AccountResponse);
+  rpc UpdateAccount(UpdateAccountRequest) returns (AccountResponse);
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+  rpc GetBalance(GetBalanceRequest) returns (BalanceResponse);
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+  
+  // Transaction Operations
+  rpc Deposit(DepositRequest) returns (TransactionResponse);
+  rpc Withdraw(WithdrawRequest) returns (TransactionResponse);
+  rpc Transfer(TransferRequest) returns (TransactionResponse);
+  rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse);
+  rpc GetTransaction(GetTransactionRequest) returns (TransactionResponse);
+  rpc GetAccountTransactions(GetAccountTransactionsRequest) returns (GetAccountTransactionsResponse);
+  
+  // KYC Operations
+  rpc UploadKYCDocuments(UploadKYCDocumentsRequest) returns (KYCResponse);
+  rpc GetKYCStatus(GetKYCStatusRequest) returns (KYCResponse);
+  
+  // Notification Operations
+  rpc SendNotification(SendNotificationRequest) returns (NotificationResponse);
+  rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
+  
+  // 🔐 Wallet Verification Operations
+  rpc VerifySignature(VerifySignatureRequest) returns (VerifySignatureResponse);
+  rpc GetNonce(GetNonceRequest) returns (GetNonceResponse);
+}
+
+// User Messages
+message User {
+  string id = 1;
+  string full_name = 2;
+  string email = 3;
+  string phone = 4;
+  string kyc_status = 5;
+  string profile_image_url = 6;
+  bool is_active = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+  int64 last_login_at = 10;
+}
+
+message RegisterUserRequest {
+  string full_name = 1;
+  string email = 2;
+  string phone = 3;
+  string password = 4;
+  string referral_code = 5;
+}
+
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+  string device_id = 3;
+  string device_type = 4;
+}
+
+message LoginResponse {
+  string message = 1;
+  string token = 2;
+  string refresh_token = 3;
+  int64 expires_in = 4;
+  User user = 5;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message UpdateUserRequest {
+  string user_id = 1;
+  string full_name = 2;
+  string phone = 3;
+  string profile_image_url = 4;
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+  string password = 2;
+}
+
+message DeleteUserResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+message UserResponse {
+  string message = 1;
+  User user = 2;
+}
+
+// Account Messages
+message Account {
+  string id = 1;
+  string user_id = 2;
+  string account_type = 3;
+  string account_number = 4;
+  double balance = 5;
+  string currency = 6;
+  string status = 7;
+  string nickname = 8;
+  bool is_default = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+message CreateAccountRequest {
+  string user_id = 1;
+  string account_type = 2;
+  double initial_deposit = 3;
+  string nickname = 4;
+  string currency = 5;
+}
+
+message GetAccountRequest {
+  string account_id = 1;
+}
+
+message UpdateAccountRequest {
+  string account_id = 1;
+  string status = 2;
+  string nickname = 3;
+  bool is_default = 4;
+}
+
+message DeleteAccountRequest {
+  string account_id = 1;
+  string confirmation_code = 2;
+}
+
+message DeleteAccountResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+message AccountResponse {
+  string message = 1;
+  Account account = 2;
+}
+
+message ListAccountsRequest {
+  string user_id = 1;
+  string status = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message ListAccountsResponse {
+  string message = 1;
+  repeated Account accounts = 2;
+  int32 total_count = 3;
+  int32 total_pages = 4;
+  int32 current_page = 5;
+}
+
+message BalanceResponse {
+  string account_id = 1;
+  double available_balance = 2;
+  double ledger_balance = 3;
+  string currency = 4;
+  int64 last_updated = 5;
+}
+
+// Transaction Messages
+message Transaction {
+  string id = 1;
+  string from_account_id = 2;
+  string to_account_id = 3;
+  string transaction_type = 4;
+  double amount = 5;
+  string currency = 6;
+  string description = 7;
+  string status = 8;
+  string reference_id = 9;
+  string category = 10;
+  map<string, string> metadata = 11;
+  int64 created_at = 12;
+  int64 completed_at = 13;
+}
+
+message DepositRequest {
+  string account_id = 1;
+  double amount = 2;
+  string description = 3;
+  string reference_id = 4;
+  map<string, string> metadata = 5;
+}
+
+message WithdrawRequest {
+  string account_id = 1;
+  double amount = 2;
+  string description = 3;
+  string reference_id = 4;
+  map<string, string> metadata = 5;
+}
+
+message TransferRequest {
+  string from_account_id = 1;
+  string to_account_id = 2;
+  double amount = 3;
+  string description = 4;
+  string reference_id = 5;
+  map<string, string> metadata = 6;
+}
+
+message GetTransactionsRequest {
+  string user_id = 1;
+  string account_id = 2;
+  string transaction_type = 3;
+  string status = 4;
+  string from_date = 5;
+  string to_date = 6;
+  int32 page = 7;
+  int32 limit = 8;
+  string sort_by = 9;
+  string sort_order = 10;
+}
+
+message GetTransactionRequest {
+  string transaction_id = 1;
+}
+
+message GetAccountTransactionsRequest {
+  string account_id = 1;
+  string transaction_type = 2;
+  string from_date = 3;
+  string to_date = 4;
+  int32 page = 5;
+  int32 limit = 6;
+  string sort_by = 7;
+  string sort_order = 8;
+}
+
+message TransactionResponse {
+  string message = 1;
+  Transaction transaction = 2;
+}
+
+message GetTransactionsResponse {
+  string message = 1;
+  repeated Transaction transactions = 2;
+  int32 total_count = 3;
+  int32 total_pages = 4;
+  int32 current_page = 5;
+  double total_amount = 6;
+}
+
+message GetAccountTransactionsResponse {
+  string message = 1;
+  repeated Transaction transactions = 2;
+  int32 total_count = 3;
+  int32 total_pages = 4;
+  int32 current_page = 5;
+  double total_amount = 6;
+}
+
+// KYC Messages
+message KYCDocument {
+  string id = 1;
+  string document_type = 2;
+  string document_url = 3;
+  string status = 4;
+  string rejection_reason = 5;
+  int64 uploaded_at = 6;
+  int64 verified_at = 7;
+}
+
+message UploadKYCDocumentsRequest {
+  string user_id = 1;
+  repeated KYCDocument documents = 2;
+}
+
+message GetKYCStatusRequest {
+  string user_id = 1;
+}
+
+message KYCResponse {
+  string message = 1;
+  string kyc_status = 2;
+  repeated KYCDocument documents = 3;
+  string rejection_reason = 4;
+}
+
+// Notification Messages
+message Notification {
+  string id = 1;
+  string user_id = 2;
+  string type = 3;
+  string title = 4;
+  string message = 5;
+  map<string, string> data = 6;
+  bool is_read = 7;
+  int64 created_at = 8;
+  int64 read_at = 9;
+}
+
+message SendNotificationRequest {
+  repeated string user_ids = 1;
+  string type = 2;
+  string title = 3;
+  string message = 4;
+  map<string, string> data = 5;
+}
+
+message GetNotificationsRequest {
+  string user_id = 1;
+  string type = 2;
+  bool is_read = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message NotificationResponse {
+  string message = 1;
+  Notification notification = 2;
+}
+
+message GetNotificationsResponse {
+  string message = 1;
+  repeated Notification notifications = 2;
+  int32 total_count = 3;
+  int32 unread_count = 4;
+}
+
+// Error Messages
+message ErrorResponse {
+  string error = 1;
+  int32 code = 2;
+  string message = 3;
+  map<string, string> details = 4;
+}
+
+// Common Messages
+message PaginationRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message PaginationResponse {
+  int32 current_page = 1;
+  int32 total_pages = 2;
+  int32 total_count = 3;
+  int32 has_next = 4;
+  int32 has_previous = 5;
+}
+
+message SearchRequest {
+  string query = 1;
+  repeated string fields = 2;
+  string sort_by = 3;
+  string sort_order = 4;
+}
+
+message DateRange {
+  string from_date = 1;
+  string to_date = 2;
+}
+
+// Enums
+enum AccountType {
+  ACCOUNT_TYPE_UNSPECIFIED = 0;
+  ACCOUNT_TYPE_SAVINGS = 1;
+  ACCOUNT_TYPE_CURRENT = 2;
+  ACCOUNT_TYPE_FIXED_DEPOSIT = 3;
+  ACCOUNT_TYPE_RECURRING_DEPOSIT = 4;
+}
+
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0;
+  TRANSACTION_TYPE_DEPOSIT = 1;
+  TRANSACTION_TYPE_WITHDRAWAL = 2;
+  TRANSACTION_TYPE_TRANSFER = 3;
+  TRANSACTION_TYPE_PAYMENT = 4;
+  TRANSACTION_TYPE_REFUND = 5;
+}
+
+enum TransactionStatus {
+  TRANSACTION_STATUS_UNSPECIFIED = 0;
+  TRANSACTION_STATUS_PENDING = 1;
+  TRANSACTION_STATUS_PROCESSING = 2;
+  TRANSACTION_STATUS_COMPLETED = 3;
+  TRANSACTION_STATUS_FAILED = 4;
+  TRANSACTION_STATUS_CANCELLED = 5;
+}
+
+enum KYCStatus {
+  KYC_STATUS_UNSPECIFIED = 0;
+  KYC_STATUS_NOT_STARTED = 1;
+  KYC_STATUS_PENDING = 2;
+  KYC_STATUS_UNDER_REVIEW = 3;
+  KYC_STATUS_VERIFIED = 4;
+  KYC_STATUS_REJECTED = 5;
+}
+
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSPECIFIED = 0;
+  NOTIFICATION_TYPE_TRANSACTION = 1;
+  NOTIFICATION_TYPE_ACCOUNT = 2;
+  NOTIFICATION_TYPE_SECURITY = 3;
+  NOTIFICATION_TYPE_PROMOTIONAL = 4;
+  NOTIFICATION_TYPE_SYSTEM = 5;
+}
+
+// 🔐 Wallet Verification Messages
+message VerifySignatureRequest {
+  string address = 1;
+  string message = 2;
+  string signature = 3;
+}
+
+message VerifySignatureResponse {
+  bool verified = 1;
+  string address = 2;
+  float confidence = 3;
+  string error = 4;
+  int64 timestamp = 5;
+}
+
+message GetNonceRequest {
+  string address = 1;
+}
+
+message GetNonceResponse {
+  string nonce = 1;
+  string message = 2;
+  int64 expires_at = 3;
+}

@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package banking;
+
+option go_package = "./proto";
+
+// Banking Service Definition
+service BankingService {
+    // Account Operations
+    rpc CreateAccount(CreateAccountRequest) returns (AccountResponse);
+    rpc GetAccountDetails(AccountRequest) returns (AccountDetails);
+    rpc VerifyAccount(VerifyAccountRequest) returns (VerificationResponse);
+    
+    // Transaction Operations
+    rpc ProcessPayment(PaymentRequest) returns (PaymentResponse);
+    rpc ProcessWithdrawal(WithdrawalRequest) returns (TransactionResponse);
+    rpc ProcessDeposit(DepositRequest) returns (TransactionResponse);
+    rpc GetTransactionHistory(TransactionHistoryRequest) returns (TransactionHistoryResponse);
+    
+    // Secure Operations (Rust handles these)
+    rpc ValidatePIN(PINRequest) returns (PINResponse);
+    rpc EncryptData(EncryptRequest) returns (EncryptResponse);
+    rpc DecryptData(DecryptRequest) returns (DecryptResponse);
+    rpc GenerateSecureToken(TokenRequest) returns (TokenResponse);
+}
+
+// Account Messages
+message CreateAccountRequest {
+    string account_holder_name = 1;
+    string date_of_birth = 2;
+    string mobile_number = 3;
+    string email = 4;
+    string address = 5;
+    string pincode = 6;
+    string pan_card = 7;
+    string aadhaar_number = 8;
+    string account_type = 9;
+    string initial_deposit = 10;
+    string pin = 11;
+}
+
+message AccountResponse {
+    string account_number = 1;
+    string ifsc_code = 2;
+    string status = 3;
+    string message = 4;
+    int64 created_at = 5;
+}
+
+message AccountRequest {
+    string account_number = 1;
+}
+
+message AccountDetails {
+    string account_number = 1;
+    string account_holder_name = 2;
+    string account_type = 3;
+    string balance = 4;
+    string ifsc_code = 5;
+    string branch_name = 6;
+    string status = 7;
+    string kyc_status = 8;
+    int64 created_at = 9;
+    int64 last_updated = 10;
+}
+
+message VerifyAccountRequest {
+    string account_number = 1;
+    string pan_card = 2;
+    string aadhaar_number = 3;
+}
+
+message VerificationResponse {
+    bool verified = 1;
+    string message = 2;
+    float confidence_score = 3;
+}
+
+// Transaction Messages
+message PaymentRequest {
+    string from_account = 1;
+    string to_account = 2;
+    string amount = 3;
+    string pin = 4;
+    string description = 5;
+    string transaction_type = 6;
+}
+
+message PaymentResponse {
+    string transaction_id = 1;
+    string status = 2;
+    string message = 3;
+    string from_account_balance = 4;
+    string to_account_balance = 5;
+    int64 timestamp = 6;
+    string reference_number = 7;
+}
+
+message WithdrawalRequest {
+    string account_number = 1;
+    string amount = 2;
+    string pin = 3;
+    string withdrawal_type = 4; // ATM, Online, Branch
+}
+
+message DepositRequest {
+    string account_number = 1;
+    string amount = 2;
+    string deposit_type = 3; // Cash, Check, Transfer
+    string description = 4;
+}
+
+message TransactionResponse {
+    string transaction_id = 1;
+    string status = 2;
+    string message = 3;
+    string new_balance = 4;
+    int64 timestamp = 5;
+}
+
+message TransactionHistoryRequest {
+    string account_number = 1;
+    int32 limit = 2;
+    int64 from_date = 3;
+    int64 to_date = 4;
+    string transaction_type = 5;
+}
+
+message TransactionHistoryResponse {
+    repeated Transaction transactions = 1;
+    int32 total_count = 2;
+    string closing_balance = 3;
+}
+
+message Transaction {
+    string transaction_id = 1;
+    string type = 2;
+    string amount = 3;
+    string from_account = 4;
+    string to_account = 5;
+    string status = 6;
+    string description = 7;
+    int64 timestamp = 8;
+    string reference_number = 9;
+}
+
+// Secure Operations Messages
+message PINRequest {
+    string account_number = 1;
+    string pin = 2;
+    string operation = 3;
+}
+
+message PINResponse {
+    bool valid = 1;
+    string message = 2;
+    int32 attempts_remaining = 3;
+    bool account_locked = 4;
+}
+
+message EncryptRequest {
+    string data = 1;
+    string key_id = 2;
+}
+
+message EncryptResponse {
+    string encrypted_data = 1;
+    string key_id = 2;
+    string algorithm = 3;
+}
+
+message DecryptRequest {
+    string encrypted_data = 1;
+    string key_id = 2;
+}
+
+message DecryptResponse {
+    string decrypted_data = 1;
+    bool success = 2;
+}
+
+message TokenRequest {
+    string account_number = 1;
+    int32 expiry_minutes = 2;
+    string purpose = 3;
+}
+
+message TokenResponse {
+    string token = 1;
+    int64 expires_at = 2;
+    string signature = 3;
+}
