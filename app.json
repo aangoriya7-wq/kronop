@@ -79,8 +79,10 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "6dc9b76b-95bf-4c94-a09f-e4481b97cac2"
-      }
+        "projectId": "b119a84a-5a57-4eb1-9a69-e50bb1cfd408"
+      },
+      "EXPO_PUBLIC_SUPABASE_URL": "https://gwcninkeyevhvzvttejw.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_cW3yIEO181NiuycpfdTVrQ_ObM5jro7"
     }
   }
 }

@@ -123,6 +123,10 @@ export default function ProfileScreen() {
     router.push('/help-center');
   };
 
+  const handleMenuPress = () => {
+    router.push('/menu');
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'video':
@@ -180,6 +184,9 @@ export default function ProfileScreen() {
       {/* Top Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
+            <Ionicons name="menu" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
           <Text style={styles.username}>Your Profile</Text>
         </View>
         <View style={styles.headerRight}>
@@ -344,6 +351,7 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
   username: {
     fontSize: 18,
