@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const supabase = require('../services/supabaseClient');
+// const supabase = require('../services/supabaseClient'); // Removed - services folder deleted
 
 const getProfile = async (req, res) => {
     try {

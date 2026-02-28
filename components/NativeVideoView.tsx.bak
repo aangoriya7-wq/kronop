@@ -1,0 +1,297 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useReelsEngine } from '@/hooks/useReelsEngine';
+
+const { width, height } = Dimensions.get('window');
+
+interface NativeVideoViewProps {
+  onVideoReady?: () => void;
+  onFrameUpdate?: (frameData: string) => void;
+  onError?: (error: string) => void;
+}
+
+export default function NativeVideoView({ 
+  onVideoReady, 
+  onFrameUpdate, 
+  onError 
+}: NativeVideoViewProps) {
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState<string>('');
+  const [textureId, setTextureId] = useState<number>(0);
+  const frameUpdateInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const {
+    reelsList,
+    currentReelIndex,
+    currentReel,
+    isPlaying,
+    isBuffering,
+    metrics,
+    isHighPerformance
+  } = useReelsEngine(true, true, 60);
+
+  // Initialize video view
+  useEffect(() => {
+    if (!isInitialized && reelsList.length > 0) {
+      setIsInitialized(true);
+      if (onVideoReady) {
+        onVideoReady();
+      }
+    }
+  }, [isInitialized, reelsList, onVideoReady]);
+
+  // Update frame data
+  const updateFrameData = async () => {
+    try {
+      // Mock frame data for now - in real implementation this would get data from C++
+      const frameData = 'mock-frame-data';
+      const texture = 12345; // Mock texture ID
+      
+      if (frameData && frameData !== currentFrame) {
+        setCurrentFrame(frameData);
+        if (onFrameUpdate) {
+          onFrameUpdate(frameData);
+        }
+      }
+      
+      if (texture && texture !== textureId) {
+        setTextureId(texture);
+      }
+    } catch (error) {
+      console.error('Failed to update frame data:', error);
+      if (onError) {
+        onError('Failed to update frame data');
+      }
+    }
+  };
+
+  // Start frame updates when playing
+  useEffect(() => {
+    if (isPlaying && isInitialized) {
+      if (frameUpdateInterval.current) {
+        clearInterval(frameUpdateInterval.current);
+      }
+      
+      frameUpdateInterval.current = setInterval(updateFrameData, 16) as unknown as NodeJS.Timeout; // ~60 FPS
+    } else {
+      if (frameUpdateInterval.current) {
+        clearInterval(frameUpdateInterval.current);
+        frameUpdateInterval.current = null;
+      }
+    }
+
+    return () => {
+      if (frameUpdateInterval.current) {
+        clearInterval(frameUpdateInterval.current);
+        frameUpdateInterval.current = null;
+      }
+    };
+  }, [isPlaying, isInitialized, updateFrameData]);
+
+  if (!isInitialized) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>🎬 Initializing Video Engine...</Text>
+          <Text style={styles.loadingSubtext}>C++ Frame Pumper</Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Native Video Surface */}
+      <View style={styles.videoSurface}>
+        {currentReel && (
+          <View style={styles.videoContent}>
+            {/* This would be the actual native video surface */}
+            <View style={styles.videoPlaceholder}>
+              <Text style={styles.videoTitle}>{currentReel.title}</Text>
+              <Text style={styles.videoDescription}>{currentReel.description}</Text>
+              
+              {/* Video Info */}
+              <View style={styles.videoInfo}>
+                <Text style={styles.videoInfoText}>
+                  🎬 {currentReel.width}x{currentReel.height}
+                </Text>
+                <Text style={styles.videoInfoText}>
+                  ⏱️ {(currentReel.duration / 1000).toFixed(1)}s
+                </Text>
+                <Text style={styles.videoInfoText}>
+                  📊 {metrics?.currentFPS.toFixed(1) || 0} FPS
+                </Text>
+                <Text style={[
+                  styles.videoInfoText,
+                  { color: isHighPerformance ? '#34c759' : '#ff9500' }
+                ]}>
+                  {isHighPerformance ? '🚀 High Performance' : '⚡ Optimizing'}
+                </Text>
+              </View>
+              
+              {/* Play/Pause Indicator */}
+              <View style={styles.playIndicator}>
+                <Text style={styles.playIndicatorText}>
+                  {isPlaying ? '⏸️ Playing' : '⏸️ Paused'}
+                </Text>
+                {isBuffering && (
+                  <Text style={styles.playIndicatorText}>
+                    ⏳ Buffering...
+                  </Text>
+                )}
+              </View>
+              
+              {/* Frame Data Info (for debugging) */}
+              {__DEV__ && (
+                <View style={styles.debugInfo}>
+                  <Text style={styles.debugText}>
+                    Frame: {currentFrame ? 'Available' : 'None'}
+                  </Text>
+                  <Text style={styles.debugText}>
+                    Texture: {textureId}
+                  </Text>
+                  <Text style={styles.debugText}>
+                    Reel: {currentReelIndex + 1}/{reelsList.length}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+      </View>
+
+      {/* Performance Overlay */}
+      {metrics && (
+        <View style={styles.performanceOverlay}>
+          <Text style={styles.performanceTitle}>🎬 C++ Frame Pumper</Text>
+          <Text style={styles.performanceText}>
+            FPS: {metrics.currentFPS.toFixed(1)} / 60
+          </Text>
+          <Text style={styles.performanceText}>
+            Frames: {metrics.totalFramesRendered}
+          </Text>
+          <Text style={styles.performanceText}>
+            Dropped: {metrics.droppedFrames}
+          </Text>
+          <Text style={[
+            styles.performanceText,
+            { color: isHighPerformance ? '#34c759' : '#ff9500' }
+          ]}>
+            {isHighPerformance ? '🟢 Optimal' : '🟡 Optimizing'}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  loadingSubtext: {
+    fontSize: 14,
+    color: '#ccc',
+  },
+  videoSurface: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoContent: {
+    width: width,
+    height: height,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoPlaceholder: {
+    width: '80%',
+    height: '60%',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  videoDescription: {
+    fontSize: 16,
+    color: '#ccc',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  videoInfo: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  videoInfoText: {
+    fontSize: 14,
+    color: '#888',
+    marginVertical: 2,
+  },
+  playIndicator: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 8,
+    padding: 12,
+  },
+  playIndicatorText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginVertical: 2,
+  },
+  debugInfo: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 8,
+    padding: 12,
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#0f0',
+    marginVertical: 1,
+    fontFamily: 'monospace',
+  },
+  performanceOverlay: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 8,
+    padding: 12,
+  },
+  performanceTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  performanceText: {
+    fontSize: 12,
+    color: '#fff',
+    marginVertical: 2,
+  },
+});

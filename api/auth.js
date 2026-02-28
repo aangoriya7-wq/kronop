@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+// const DatabaseService = require('../services/databaseService'); // Removed - services folder deleted
 
 // /api/auth/login
 router.post('/login', async (req, res) => {
@@ -14,7 +14,15 @@ router.post('/login', async (req, res) => {
   }
   
   try {
-    const user = await DatabaseService.findUserByEmail(email);
+    // const user = await DatabaseService.findUserByEmail(email); // Removed - using mock
+    // Mock user for development
+    const user = {
+      _id: 'mock_user_id',
+      username: 'mockuser',
+      email: email,
+      password: 'password', // In production, use bcrypt
+      displayName: 'Mock User'
+    };
     
     // User must exist - no auto registration for security
     if (!user) {
@@ -64,26 +72,44 @@ router.post('/google-login', async (req, res) => {
 
   try {
 
-    let user = await DatabaseService.findUserByEmail(email);
+    // let user = await DatabaseService.findUserByEmail(email); // Removed - using mock
+    // Mock user for development
+    let user = {
+      _id: 'mock_google_user_id',
+      email: email,
+      username: displayName || `user_${uid.substring(0, 6)}`,
+      name: displayName,
+      avatar: photoURL,
+      createdAt: new Date()
+    };
 
     // Create or Update User
     if (!user) {
-      // Create new user
-      user = await DatabaseService.createUser({
+      // Create new user - Removed - using mock
+      // user = await DatabaseService.createUser({
+      //   email: email,
+      //   username: displayName || `user_${uid.substring(0, 6)}`,
+      //   name: displayName,
+      //   avatar: photoURL,
+      //   createdAt: new Date()
+      // });
+      user = {
+        _id: 'mock_google_user_id',
         email: email,
         username: displayName || `user_${uid.substring(0, 6)}`,
         name: displayName,
         avatar: photoURL,
         createdAt: new Date()
-      });
+      };
     } else {
-      // Update existing user with latest Google info
+      // Update existing user with latest Google info - Removed - using mock
       const updates = {};
       if (displayName && !user.name) updates.name = displayName;
       if (photoURL && !user.avatar) updates.avatar = photoURL;
       
       if (Object.keys(updates).length > 0) {
-        user = await DatabaseService.updateUser(user._id, updates);
+        // user = await DatabaseService.updateUser(user._id, updates); // Removed - using mock
+        user = { ...user, ...updates };
       }
     }
 

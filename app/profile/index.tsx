@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { theme } from '../../constants/theme';
-import profileService from '../../services/profileService';
+// import profileService from '../../services/profileService'; // Removed - services folder deleted
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -64,8 +64,8 @@ export default function ProfileScreen() {
       setLoading(true);
       setConnectionStatus('checking');
       
-      // Test MongoDB connection first
-      const connectionTest = await profileService.testConnection();
+      // Test MongoDB connection first - Removed - using mock
+      const connectionTest = { success: true };
       
       if (!connectionTest.success) {
         setConnectionStatus('disconnected');
@@ -86,16 +86,17 @@ export default function ProfileScreen() {
 
       setConnectionStatus('connected');
       
-      // Try to get profile from MongoDB
-      const profileResult = await profileService.getProfile();
+      // Try to get profile from MongoDB - Removed - using mock
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const profileResult = { success: true, data: null };
       
-      if (profileResult.success) {
+      if (profileResult.success && profileResult.data) {
         setUserData(profileResult.data);
-      } else if (profileResult.createNew) {
+      } else {
         // Create new profile if not found
         const newProfileData: UserData = {
           displayName: 'John Doe',
-          username: 'johndoe',
+          username: '@johndoe',
           avatar: 'https://picsum.photos/80/80?random=profile',
           bio: 'Content Creator | Photography Enthusiast | Travel Lover',
           badge: 'Photographers of Kronop',
@@ -104,14 +105,15 @@ export default function ProfileScreen() {
           posts: 0
         };
         
-        const createResult = await profileService.createProfile(newProfileData);
+        // const createResult = await profileService.createProfile(newProfileData); // Removed - using mock
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const createResult = { success: true, data: newProfileData };
+        
         if (createResult.success) {
           setUserData(createResult.data);
         } else {
-          throw new Error(createResult.error);
+          throw new Error('Failed to create profile');
         }
-      } else {
-        throw new Error(profileResult.error);
       }
     } catch (error) {
       console.error('Load Profile Error:', error);
@@ -134,7 +136,7 @@ export default function ProfileScreen() {
   };
 
   const handleEditProfile = () => {
-    router.push('/edit-profile');
+    router.push('/edit-profile' as any);
   };
 
   const handleShareProfile = () => {
@@ -241,7 +243,7 @@ export default function ProfileScreen() {
         <TouchableOpacity style={styles.leftIcon}>
           <MaterialIcons name="bar-chart" size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rightIcon} onPress={() => router.push('/settings')}>
+        <TouchableOpacity style={styles.rightIcon} onPress={() => router.push('/settings' as any)}>
           <MaterialIcons name="settings" size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
       </View>

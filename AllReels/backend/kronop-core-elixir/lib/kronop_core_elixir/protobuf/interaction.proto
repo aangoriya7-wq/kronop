@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package kronop.core;
+
+// Like (Star) interaction
+message LikeInteraction {
+  string id = 1;
+  string user_id = 2;
+  int32 reel_id = 3;
+  bool is_liked = 4;
+  int64 timestamp = 5;
+  string device_info = 6;
+  string location = 7;
+}
+
+// Comment interaction
+message CommentInteraction {
+  string id = 1;
+  string user_id = 2;
+  int32 reel_id = 3;
+  string text = 4;
+  string username = 5;
+  int64 timestamp = 6;
+  int32 likes = 7;
+  string parent_comment_id = 8;
+  string device_info = 9;
+}
+
+// Share interaction
+message ShareInteraction {
+  string id = 1;
+  string user_id = 2;
+  int32 reel_id = 3;
+  string platform = 4;
+  string share_url = 5;
+  int64 timestamp = 6;
+  string device_info = 7;
+  string location = 8;
+}
+
+// Save interaction
+message SaveInteraction {
+  string id = 1;
+  string user_id = 2;
+  int32 reel_id = 3;
+  bool is_saved = 4;
+  int64 timestamp = 5;
+  string device_info = 6;
+  string location = 7;
+}
+
+// Support (Follow) interaction
+message SupportInteraction {
+  string id = 1;
+  string user_id = 2;
+  string target_user_id = 3;
+  bool is_supporting = 4;
+  int64 timestamp = 5;
+  string device_info = 6;
+  string location = 7;
+}
+
+// Batch interaction update
+message BatchInteractionUpdate {
+  repeated LikeInteraction likes = 1;
+  repeated CommentInteraction comments = 2;
+  repeated ShareInteraction shares = 3;
+  repeated SaveInteraction saves = 4;
+  repeated SupportInteraction supports = 5;
+  int64 batch_timestamp = 6;
+  string batch_id = 7;
+}
+
+// Interaction response
+message InteractionResponse {
+  bool success = 1;
+  string error_message = 2;
+  int64 timestamp = 3;
+  string interaction_id = 4;
+  int32 updated_count = 5;
+}
+
+// Real-time interaction event
+message InteractionEvent {
+  string event_type = 1;
+  string event_id = 2;
+  int32 reel_id = 3;
+  string user_id = 4;
+  map<string, string> data = 5;
+  int64 timestamp = 6;
+  string target_channel = 7;
+  repeated string target_users = 8;
+}
+
+// Interaction statistics
+message InteractionStats {
+  int32 reel_id = 1;
+  int32 total_likes = 2;
+  int32 total_comments = 3;
+  int32 total_shares = 4;
+  int32 total_saves = 5;
+  int32 total_supports = 6;
+  int64 last_updated = 7;
+  map<string, int32> user_interactions = 8;
+}
+
+// User interaction history
+message UserInteractionHistory {
+  string user_id = 1;
+  repeated LikeInteraction liked_reels = 2;
+  repeated CommentInteraction commented_reels = 3;
+  repeated ShareInteraction shared_reels = 4;
+  repeated SaveInteraction saved_reels = 5;
+  repeated SupportInteraction supported_users = 6;
+  int64 last_updated = 7;
+}
+
+// Interaction notification
+message InteractionNotification {
+  string id = 1;
+  string user_id = 2;
+  string notification_type = 3;
+  string title = 4;
+  string body = 5;
+  map<string, string> data = 6;
+  int64 timestamp = 7;
+  bool is_read = 8;
+}

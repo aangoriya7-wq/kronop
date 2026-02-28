@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
-import { reelsApi, photosApi, videosApi } from '../../services/api';
+// import { reelsApi, photosApi, videosApi } from '../../services/api'; // Removed - services folder deleted
 
 const { width, height } = Dimensions.get('window');
 
@@ -62,32 +62,34 @@ export default function ContentListWindow({ visible, onClose, contentType = 'all
       
       switch (type) {
         case 'reels':
-          const reelsData = await reelsApi.getUserReels();
-          data = Array.isArray(reelsData) ? reelsData : [];
+          // const reelsData = await reelsApi.getUserReels(); // Removed - using AllReels
+          data = []; // Temporarily empty - will use AllReels system
           break;
         case 'photos':
-          const photosData = await photosApi.getUserPhotos();
-          data = Array.isArray(photosData) ? photosData : [];
+          const photosResponse = await fetch('http://localhost:3000/api/photos');
+          const photosResult = await photosResponse.json();
+          data = photosResult?.data || [];
           break;
         case 'videos':
-          const videosData = await videosApi.getUserVideos();
-          data = Array.isArray(videosData) ? videosData : [];
+          const videosResponse = await fetch('http://localhost:3000/api/videos');
+          const videosResult = await videosResponse.json();
+          data = videosResult?.data || [];
           break;
         case 'shayari':
           data = [];
           break;
         case 'all':
           // Load all content types
-          const [reels, photos, videos] = await Promise.all([
-            reelsApi.getUserReels().catch(() => []),
-            photosApi.getUserPhotos().catch(() => []),
-            videosApi.getUserVideos().catch(() => []),
+          const [photos, videos] = await Promise.all([
+            // reelsApi.getUserReels().catch(() => []), // Removed - using AllReels
+            fetch('http://localhost:3000/api/photos').then(res => res.json()).then(res => res?.data || []).catch(() => []),
+            fetch('http://localhost:3000/api/videos').then(res => res.json()).then(res => res?.data || []).catch(() => []),
             Promise.resolve([])
           ]);
           data = [
-            ...(Array.isArray(reels) ? reels.map(item => ({ ...item, type: 'reel' })) : []),
-            ...(Array.isArray(photos) ? photos.map(item => ({ ...item, type: 'photo' })) : []),
-            ...(Array.isArray(videos) ? videos.map(item => ({ ...item, type: 'video' })) : [])
+            // Reels removed - now using AllReels system
+            ...(Array.isArray(photos) ? photos.map((item: any) => ({ ...item, type: 'photo' })) : []),
+            ...(Array.isArray(videos) ? videos.map((item: any) => ({ ...item, type: 'video' })) : [])
           ];
           break;
       }

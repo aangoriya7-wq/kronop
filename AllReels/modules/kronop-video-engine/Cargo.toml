@@ -1,0 +1,53 @@
+[package]
+name = "kronop-video-engine"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance video decoding engine for Reels app"
+license = "MIT"
+
+[lib]
+name = "kronop_video_engine"
+crate-type = ["cdylib"]
+
+[dependencies]
+# FFmpeg bindings
+ffmpeg-sys-next = "6.0"
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+# FFI for JavaScript integration
+jni = "0.21"
+# Logging
+log = "0.4"
+env_logger = "0.10"
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+# Utilities
+uuid = { version = "1.0", features = ["v4"] }
+# Memory management
+parking_lot = "0.12"
+# Image processing
+image = "0.24"
+# Video processing
+opencv = { version = "0.88", optional = true }
+# WebRTC for streaming
+webrtc = "0.8"
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# Hashing
+sha2 = "0.10"
+
+[features]
+default = ["opencv"]
+hardware-acceleration = ["opencv"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true

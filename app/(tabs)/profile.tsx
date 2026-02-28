@@ -14,7 +14,6 @@ import {
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import profileService from '../../services/profileService.js';
 
 const mockUserData = {
   displayName: 'John Doe',
@@ -58,7 +57,11 @@ export default function ProfileScreen() {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      const result = await profileService.fetchProfile();
+      // const result = await profileService.fetchProfile(); // Removed - using mock data
+      // Simulate API call with mock data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const result = { success: true, data: mockUserData };
+      
       if (result.success && result.data) {
         setUserData(result.data);
         setEditData({
@@ -88,7 +91,10 @@ export default function ProfileScreen() {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      const result = await profileService.updateProfile(editData);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const result = { success: true };
+      
       if (result.success) {
         setUserData(prev => ({
           ...prev,
@@ -97,9 +103,10 @@ export default function ProfileScreen() {
         setIsEditing(false);
         Alert.alert('Success', 'Profile updated successfully');
       } else {
-        Alert.alert('Error', result.error || 'Failed to update profile');
+        Alert.alert('Error', 'Failed to update profile'); // Removed result.error since mock doesn't have it
       }
     } catch (error) {
+      console.error('Failed to update profile:', error);
       Alert.alert('Error', 'Failed to update profile');
     } finally {
       setLoading(false);
@@ -111,20 +118,20 @@ export default function ProfileScreen() {
   };
 
   const handleSettingsPress = () => {
-    router.push('/settings');
+    router.push('/settings' as any);
   };
 
   const handleVerificationPress = () => {
-    router.push('/verification');
+    router.push('/verification' as any);
   };
 
   const handleSupporterPress = () => {
     // Open help center which uses GroqAIService
-    router.push('/help-center');
+    router.push('/help-center' as any);
   };
 
   const handleMenuPress = () => {
-    router.push('/menu');
+    router.push('/menu' as any);
   };
 
   const renderTabContent = () => {

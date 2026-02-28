@@ -8,16 +8,15 @@ import { StoryViewer } from '../../components/feature';
 import { StorySection } from '../../components/feature/StorySection';
 import { theme } from '../../constants/theme';
 import { useAlert } from '../../template';
-import { Story } from '../../types/story';
+// import { Story } from '../../types/story'; // Removed - types folder deleted
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-import { photosApi, storiesApi } from '../../services/api';
 import StatusBarOverlay from '../../components/common/StatusBarOverlay';
 import AppLogo from '../../components/common/AppLogo';
 import HeaderButton from '../../components/common/HeaderButton';
 import StoryUpload from '../../components/upload/StoryUpload';
 import PhotoUpload from '../../components/upload/PhotoUpload';
-import ReelsUpload from '../../components/upload/ReelsUpload';
+// import ReelsUpload from '../../components/upload/ReelsUpload'; // Removed - now using AllReels
 import VideoUpload from '../../components/upload/VideoUpload';
 import LiveUpload from '../../components/upload/LiveUpload';
 import SongUpload from '../../components/upload/SongUpload';
@@ -25,7 +24,6 @@ import SongUpload from '../../components/upload/SongUpload';
 // Bridge imports
 import BridgeStory from '../../components/uploadBridge/bridge-story';
 import BridgePhoto from '../../components/uploadBridge/bridge-photo';
-import BridgeReels from '../../components/uploadBridge/bridge-reels';
 import BridgeVideo from '../../components/uploadBridge/bridge-video';
 import BridgeLive from '../../components/uploadBridge/bridge-live';
 import BridgeSongs from '../../components/uploadBridge/bridge-songs';
@@ -164,7 +162,7 @@ interface GroupedStory {
   userId: string;
   userName: string;
   userAvatar: string;
-  stories: Story[];
+  stories: any[];
   latestTimestamp: string;
 }
 
@@ -188,7 +186,7 @@ export default function HomeScreen() {
   const [groupedStories, setGroupedStories] = useState<GroupedStory[]>([]);
   const [storiesLoading, setStoriesLoading] = useState(true);
   const [storyViewerVisible, setStoryViewerVisible] = useState(false);
-  const [selectedStoryGroup, setSelectedStoryGroup] = useState<Story[]>([]);
+  const [selectedStoryGroup, setSelectedStoryGroup] = useState<any[]>([]);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
 
   // Photo categories state - Vertical with infinite scroll
@@ -207,12 +205,10 @@ export default function HomeScreen() {
     setStoriesLoading(true);
     try {
       // Use the new story service for grouped stories
-      const { storyService } = await import('../../services/storyService');
-      const result = await storyService.getGroupedStories();
-      
-      
-      if (result.success) {
-        setGroupedStories(result.data as any);
+      const result = await fetch('http://localhost:3000/api/stories');
+      const data = await result.json();
+      if (data.success) {
+        setGroupedStories(data.data as any);
       } else {
         // Fallback to mock data if API fails
         const mockStories = [
@@ -340,7 +336,9 @@ export default function HomeScreen() {
   const loadInitialPhotos = async () => {
     setPhotosLoading(true);
     try {
-      const result = await photosApi.getPhotos();
+      const response = await fetch('http://localhost:3000/api/photos');
+      const result = await response.json();
+      const photos = result?.data || [];
       if (result && result.length > 0) {
         setCategoryPhotos(result);
         setHasMorePhotos(result.length > 20);
@@ -367,9 +365,9 @@ export default function HomeScreen() {
   };
 
   // Compressed header button handlers
-  const handleNotificationPress = () => router.push('/notifications');
-  const handleSearchPress = () => router.push('/search-user/search-user');
-  const handleChatPress = () => router.push('/chat');
+  const handleNotificationPress = () => router.push('/(tabs)/notifications' as any);
+  const handleSearchPress = () => router.push('/search-user' as any);
+  const handleChatPress = () => router.push('/chat' as any);
   const handleMusicPress = () => setShowMusicModal(true);
   const handleUploadPress = () => setShowUploadModal(true);
 
@@ -422,7 +420,9 @@ export default function HomeScreen() {
     setPhotosLoading(true);
 
     try {
-      const result = await photosApi.getPhotos();
+      const response = await fetch('http://localhost:3000/api/photos');
+      const result = await response.json();
+      const photos = result?.data || [];
       if (result) {
         if (categoryId === 'all') {
           setCategoryPhotos(result);
@@ -796,7 +796,7 @@ export default function HomeScreen() {
           <View style={styles.uploadScreenContainer}>
             {selectedUploadScreen === 'Story' && <BridgeStory onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Photo' && <BridgePhoto onClose={() => setSelectedUploadScreen(null)} />}
-            {selectedUploadScreen === 'Reels' && <BridgeReels onClose={() => setSelectedUploadScreen(null)} />}
+            {/* {selectedUploadScreen === 'Reels' && <BridgeReels onClose={() => setSelectedUploadScreen(null)} />} */} {/* Removed - now using AllReels */}
             {selectedUploadScreen === 'Video' && <BridgeVideo onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Live' && <BridgeLive onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Song' && <BridgeSongs onClose={() => setSelectedUploadScreen(null)} />}

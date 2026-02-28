@@ -146,7 +146,7 @@ app.get('/debug/database', async (req, res) => {
         Content.countDocuments({ type: 'Story', is_active: true })
       ]);
       
-      debug.content = { total: counts[0], photos: counts[1], videos: counts[2], reels: counts[3], stories: counts[4] };
+      debug.content = { total: counts[0], photos: counts[1], videos: counts[2], /* reels: counts[3], */ stories: counts[3] };
     }
     
     res.json({ success: true, debug });
@@ -294,16 +294,7 @@ const getSmartFeed = async (contentType, req, res) => {
   }
 };
 
-// Content routes
-app.get('/api/reels', cacheMiddleware((req) => `reels:${req.query.userId || 'public'}:${req.query.page || 1}`, 180), (req, res) => getSmartFeed('Reel', req, res));
-app.get('/api/reels/user', async (req, res) => {
-  try {
-    const data = await BunnyContentService.getContentForFrontend('Reel', parseInt(req.query.page || 1), parseInt(req.query.limit || 20), null);
-    res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Content routes - Old reels endpoints removed, now using AllReels system
 
 app.get('/api/photos', cacheMiddleware((req) => `photos:${req.query.userId || 'public'}:${req.query.category || 'all'}:${req.query.page || 1}`, 300), (req, res) => getSmartFeed('Photo', req, res));
 app.get('/api/photos/user', async (req, res) => {
@@ -369,7 +360,7 @@ app.post('/upload/url', async (req, res) => {
     
     let uploadUrl, contentId;
     const contentTypes = {
-      reel: { libraryId: '593793', api: 'video' },
+      // reel: { libraryId: '593793', api: 'video' }, // Removed - now using AllReels system
       video: { libraryId: '593795', api: 'video' },
       live: { libraryId: '594452', api: 'video' },
       photo: { zone: 'photu', api: 'storage' },
@@ -450,7 +441,7 @@ const sendBroadcastUploadNotification = async (uploadType, contentDoc) => {
       live: { title: 'Live शुरू हो गया!', body: 'जल्दी आओ! कोई लाइव आया है! 🔴' },
       story: { title: 'नई स्टोरी!', body: 'किसी ने अभी नई स्टोरी डाली है, देखो अभी! 📸' },
       photo: { title: 'नई फोटो!', body: 'नई फोटो अपलोड हुई है—देखो अभी! 🖼️' },
-      reel: { title: 'नई रील!', body: 'नई रील आई है—मज़ा आएगा, अभी देखें! 🎬' },
+      // reel: { title: 'नई रील!', body: 'नई रील आई है—मज़ा आएगा, अभी देखें! 🎬' }, // Removed - now using AllReels system
       video: { title: 'नई वीडियो!', body: 'नई वीडियो अपलोड हुई है—अभी प्ले करें! ▶️' }
     };
     
@@ -523,8 +514,7 @@ const createUploadEndpoint = (contentType, extraFields = {}) => async (req, res)
   }
 };
 
-// Public upload endpoints (NO LOGIN)
-app.post('/upload/reel', createUploadEndpoint('reel'));
+// Public upload endpoints (NO LOGIN) - Old reel upload removed, now using AllReels system
 app.post('/upload/video', createUploadEndpoint('video'));
 app.post('/upload/live', (req, res) => createUploadEndpoint('live', { streamKey: req.body.streamKey })(req, res));
 app.post('/upload/story', (req, res) => createUploadEndpoint('story', { expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) })(req, res));
@@ -613,7 +603,7 @@ const server = app.listen(PORT, HOST, async () => {
 });
 
 // Delete endpoints for cleanup
-['reels', 'videos', 'photos', 'shayari', 'stories'].forEach(type => {
+['videos', 'photos', 'shayari', 'stories'].forEach(type => { // Removed 'reels' - now using AllReels system
   app.delete(`/api/${type}/:id`, async (req, res) => {
     try {
       const result = await Content.deleteOne({ _id: req.params.id, type: type.charAt(0).toUpperCase() + type.slice(1, -1) });

@@ -1,0 +1,166 @@
+# Kronop Prefetcher Engine Configuration
+# AI-based Smart Video Prefetching System
+
+# Server Configuration
+server:
+  host: "localhost"
+  port: 8080
+  read_timeout: 30s
+  write_timeout: 30s
+  idle_timeout: 60s
+
+# Prefetcher Configuration
+prefetcher:
+  # Maximum concurrent prefetching goroutines
+  max_concurrent_prefetches: 10
+  
+  # Prefetching strategy
+  strategy: "ai_adaptive" # Options: aggressive, conservative, ai_adaptive
+  
+  # Default prefetch count
+  default_prefetch_count: 3
+  
+  # Maximum prefetch count
+  max_prefetch_count: 10
+  
+  # Prefetching timeout
+  prefetch_timeout: 30s
+  
+  # Retry configuration
+  retry_attempts: 3
+  retry_delay: 1s
+  
+  # Cache configuration
+  cache_size_mb: 100
+  cache_ttl: 1h
+  
+  # Background processing
+  background_processing: true
+  processing_interval: 100ms
+
+# AI Behavior Analyzer Configuration
+analyzer:
+  # User behavior tracking
+  enable_scroll_tracking: true
+  enable_watch_time_tracking: true
+  enable_interaction_tracking: true
+  
+  # Analysis window (how much history to consider)
+  analysis_window: 30min
+  
+  # Pattern recognition
+  min_samples_for_pattern: 5
+  pattern_confidence_threshold: 0.7
+  
+  # Behavior categories
+  behavior_categories:
+    fast_scroller:
+      threshold_scroll_speed: 5.0  # reels per second
+      prefetch_count: 5
+      priority: "high"
+    
+    normal_viewer:
+      threshold_scroll_speed: 2.0
+      prefetch_count: 3
+      priority: "medium"
+    
+    slow_viewer:
+      threshold_scroll_speed: 0.5
+      prefetch_count: 2
+      priority: "low"
+    
+    binge_watcher:
+      threshold_watch_time: 30s  # per reel
+      prefetch_count: 8
+      priority: "high"
+    
+    casual_browser:
+      threshold_watch_time: 5s
+      prefetch_count: 2
+      priority: "low"
+
+# Video Source Configuration
+video_sources:
+  # Rust/C++ Engine connection
+  rust_engine:
+    host: "localhost"
+    port: 9090
+    protocol: "http"
+    timeout: 10s
+    
+  # CDN Configuration
+  cdn:
+    base_url: "https://cdn.kronop.com/reels"
+    timeout: 15s
+    max_retries: 3
+    
+  # Fallback sources
+  fallback:
+    - "https://backup1.kronop.com/reels"
+    - "https://backup2.kronop.com/reels"
+
+# Performance Configuration
+performance:
+  # Go runtime settings
+  max_procs: 4
+  max_memory_mb: 512
+  
+  # Prefetching performance
+  max_download_speed_mbps: 50
+  max_concurrent_downloads: 5
+  
+  # Connection pooling
+  max_idle_connections: 100
+  max_idle_connections_per_host: 10
+
+# Monitoring Configuration
+monitoring:
+  enable_metrics: true
+  enable_tracing: true
+  enable_profiling: false
+  
+  # Metrics collection
+  metrics_interval: 10s
+  metrics_retention: 24h
+  
+  # Health checks
+  health_check_interval: 30s
+  health_check_timeout: 5s
+
+# Logging Configuration
+logging:
+  level: "info"
+  format: "json"
+  
+  # Log outputs
+  outputs:
+    - type: "console"
+      level: "info"
+    - type: "file"
+      path: "/var/log/kronop-prefetcher.log"
+      level: "debug"
+      max_size_mb: 100
+      max_files: 5
+
+# Security Configuration
+security:
+  # API authentication
+  enable_auth: false
+  api_key_header: "X-API-Key"
+  
+  # Rate limiting
+  enable_rate_limit: true
+  requests_per_minute: 1000
+  
+  # CORS
+  enable_cors: true
+  allowed_origins:
+    - "http://localhost:3000"
+    - "https://kronop.com"
+
+# Development Configuration
+development:
+  debug_mode: false
+  mock_video_sources: false
+  enable_pprof: false
+  enable_hot_reload: false

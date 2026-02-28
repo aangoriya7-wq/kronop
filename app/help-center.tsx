@@ -16,7 +16,13 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SafeScreen } from '../components/layout';
 import { theme } from '../constants/theme';
-import { groqAI, GroqMessage } from '../services/groqAIService';
+// import { groqAI, GroqMessage } from '../services/groqAIService'; // Removed - services folder deleted
+
+// Define GroqMessage interface since service was removed
+interface GroqMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 interface Message {
   id: string;
@@ -64,22 +70,32 @@ export default function HelpCenterScreen() {
     }, 100);
 
     try {
-      // Convert messages to Groq format (exclude system messages)
-      const groqMessages: GroqMessage[] = messages
-        .filter(msg => msg.role !== 'system')
-        .map(msg => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content
-        }));
+      // Convert messages to Groq format (exclude system messages) - Removed - using mock
+      // const groqMessages: GroqMessage[] = messages
+      //   .filter(msg => msg.role !== 'system')
+      //   .map(msg => ({
+      //     role: msg.role as 'user' | 'assistant',
+      //     content: msg.content
+      //   }));
 
-      // Add current user message
-      groqMessages.push({
-        role: 'user',
-        content: inputText.trim()
-      });
+      // Add current user message - Removed - using mock
+      // groqMessages.push({
+      //   role: 'user',
+      //   content: inputText.trim()
+      // });
 
-      // Get AI response
-      const aiResponse = await groqAI.sendMessage(groqMessages);
+      // Get AI response - Removed - using mock
+      // const aiResponse = await groqAI.sendMessage(groqMessages);
+      
+      // Mock AI response
+      const mockResponses = [
+        "आपकी समस्या के लिए मैं यहां हूं! मैं आपकी मदद करने के लिए तैयार हूं।",
+        "यह एक अच्छा सवाल है! मुझे विस्तार से जानकारी मिलेगी और मैं आपकी सहायता करूंगा।",
+        "मैं आपकी पूरी सहायता करूंगा। कृपया मुझे अपनी समस्या विस्तार से बताएं।",
+        "धन्यवाद आपने हमारे help center का उपयोग किया! मैं आपकी सेवा में खुश हूं।"
+      ];
+      
+      const aiResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

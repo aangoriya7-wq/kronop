@@ -164,13 +164,15 @@ import { StatusBar } from 'expo-status-bar';
 import { AlertProvider } from '../template/ui';
 import { AuthProvider } from '../template';
 import { GhostStealthProvider } from '../context/GhostStealthContext';
-import { WagmiProvider } from 'wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { http, createConfig } from 'wagmi';
-import { mainnet, polygon, arbitrum } from 'wagmi/chains';
-import { walletConnect, coinbaseWallet } from 'wagmi/connectors';
 
 import StatusBarOverlay from '../components/common/StatusBarOverlay';
+
+// Web3 imports
+import { createConfig, http } from 'wagmi';
+import { mainnet, polygon, arbitrum } from 'viem/chains';
+import { walletConnect, coinbaseWallet } from 'wagmi/connectors';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
 
 // Create wagmi config
 const config = createConfig({

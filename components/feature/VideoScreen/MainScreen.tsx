@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { theme } from '../../../constants/theme';
-import { getLongVideoById, LongVideo } from '../../../services/longVideoService';
+// import { getLongVideoById, LongVideo } from '../../../services/longVideoService'; // Removed - services folder deleted
 
 import Title from './Title';
 import Star from './Star';
@@ -13,6 +13,27 @@ import Share from './Share';
 import Setting from './Setting';
 import Horizontal from './Horizontal';
 import VideoPlayer from './VideoPlayer';
+
+// Define LongVideo interface since service was removed
+interface LongVideo {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  url?: string;
+  videoUrl?: string; // Add videoUrl property
+  duration?: number;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  createdAt?: string;
+  user?: {
+    id?: string;
+    name?: string;
+    avatar?: string;
+  };
+}
 
 export default function MainScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,7 +57,10 @@ export default function MainScreen() {
       try {
         setLoading(true);
         setError(null);
-        const fetchedVideo = await getLongVideoById(id);
+        // const fetchedVideo = await getLongVideoById(id); // Removed - using direct API
+        const response = await fetch(`http://localhost:3000/api/videos/${id}`);
+        const result = await response.json();
+        const fetchedVideo = result.success ? result.data : null;
 
         if (fetchedVideo) {
           setVideo(fetchedVideo);
@@ -181,11 +205,11 @@ export default function MainScreen() {
             <View style={styles.channelContainer}>
               <View style={styles.channelInfo}>
                 <Image 
-                  source={{ uri: video.user.avatar }} 
+                  source={{ uri: video.user?.avatar || 'https://via.placeholder.com/40' }} 
                   style={styles.avatar}
                   contentFit="cover"
                 />
-                <Text style={styles.channelName}>{video.user.name}</Text>
+                <Text style={styles.channelName}>{video.user?.name || 'Unknown Channel'}</Text>
               </View>
             </View>
 

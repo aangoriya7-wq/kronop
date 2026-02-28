@@ -1,7 +1,22 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { theme } from '../../constants/theme';
-import { LongVideo } from '../../services/longVideoService';
+// import { LongVideo } from '../../services/longVideoService'; // Removed - services folder deleted
+
+// Define LongVideo interface since service was removed
+interface LongVideo {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  url?: string;
+  duration?: number;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  createdAt?: string;
+}
 
 interface VideoCardProps {
   video: LongVideo;

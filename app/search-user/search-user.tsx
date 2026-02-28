@@ -6,7 +6,21 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
 import StatusBarOverlay from '../../components/common/StatusBarOverlay';
-import { userService, User } from '../../services/userService';
+// import { userService, User } from '../../services/userService'; // Removed - services folder deleted
+
+// Define User interface since services folder was deleted
+interface User {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string;
+  supporters: number;
+  supporting: number;
+  posts: number;
+  bio?: string;
+  isOnline?: boolean;
+  isSupporting?: boolean; // Add isSupporting property
+}
 
 // Demo users that will always remain (5-6 users as requested)
 const demoUsers: User[] = [
@@ -92,8 +106,15 @@ export default function SearchUserScreen() {
     setLoading(true);
     
     try {
-      // Search from MongoDB
-      const result = await userService.searchUsers(query.trim());
+      // Search from MongoDB - Removed - using mock
+      // const result = await userService.searchUsers(query.trim());
+      
+      // Mock search result
+      const result = { 
+        success: true, 
+        data: [], // No MongoDB users for now, only demo users
+        message: 'Search completed successfully'
+      };
       
       if (result.success && result.data) {
         // Combine demo users with MongoDB results
@@ -104,7 +125,7 @@ export default function SearchUserScreen() {
         );
         
         // Remove duplicates and combine
-        const mongoUsers = result.data.filter(user => 
+        const mongoUsers = result.data.filter((user: User) => 
           !demoFiltered.some(demo => demo.id === user.id)
         );
         
@@ -134,7 +155,7 @@ export default function SearchUserScreen() {
       const demoFiltered = demoUsers.filter(user => 
         user.username.toLowerCase().includes(query.toLowerCase()) ||
         user.displayName.toLowerCase().includes(query.toLowerCase()) ||
-        user.bio.toLowerCase().includes(query.toLowerCase())
+        (user.bio && user.bio.toLowerCase().includes(query.toLowerCase()))
       );
       setFilteredUsers(demoFiltered);
     } finally {
@@ -149,7 +170,16 @@ export default function SearchUserScreen() {
 
   const handleSupport = async (userId: string) => {
     try {
-      const result = await userService.supportUser(userId);
+      // const result = await userService.supportUser(userId); // Removed - using mock
+      // Mock support result
+      const result = {
+        success: true,
+        data: {
+          isSupporting: true,
+          supporters: 999
+        }
+      };
+      
       if (result.success && result.data) {
         // Update local state
         setFilteredUsers(prev => prev.map(user => 

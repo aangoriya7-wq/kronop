@@ -15,7 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { SafeScreen } from '../components/layout';
 import { theme } from '../constants/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { chatService } from '../services/chatService';
+// import { chatService } from '../services/chatService'; // Removed - services folder deleted
 
 type ChatTab = 'support' | 'supporting';
 
@@ -164,8 +164,26 @@ export default memo(function ChatScreen() {
         setConversations(fallbackData);
         return;
       }
-      const convs = await chatService.getConversations(String(currentUserId));
-      const transformedChats: ChatUser[] = convs.map((conv: any) => {
+      // const convs = await chatService.getConversations(String(currentUserId)); // Removed - using mock data
+      // Mock conversations
+      const mockConvs = [
+        {
+          id: 'conv1',
+          participants: [currentUserId, 'user2'],
+          participant: { name: 'John Doe', avatar: 'https://picsum.photos/seed/john/150' },
+          lastMessage: 'Hello! How can I help you?',
+          lastMessageTime: new Date()
+        },
+        {
+          id: 'conv2',
+          participants: [currentUserId, 'user3'],
+          participant: { name: 'Jane Smith', avatar: 'https://picsum.photos/seed/jane/150' },
+          lastMessage: 'Thanks for your support!',
+          lastMessageTime: new Date(Date.now() - 3600000)
+        }
+      ];
+      
+      const transformedChats: ChatUser[] = mockConvs.map((conv: any) => {
         const otherId = (conv.participants || []).find((p: string) => String(p) !== String(currentUserId));
         return {
           id: conv.id || otherId || String(Math.random()),
@@ -203,7 +221,7 @@ export default memo(function ChatScreen() {
 
   const handleChatPress = (user: ChatUser) => {
     router.push({
-      pathname: '/chat-detail',
+      pathname: '/chat-detail' as any,
       params: {
         userId: user.id,
         userName: user.name,

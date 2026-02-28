@@ -1,0 +1,310 @@
+syntax = "proto3";
+
+package kronop.core;
+
+// User profile information
+message UserProfile {
+  string user_id = 1;
+  string username = 2;
+  string email = 3;
+  string display_name = 4;
+  string avatar_url = 5;
+  string bio = 6;
+  map<string, string> preferences = 7;
+  map<string, string> stats = 8;
+  int32 total_reels_viewed = 9;
+  int32 total_time_spent = 10;
+  int32 followers_count = 11;
+  int32 following_count = 12;
+  int32 likes_received = 13;
+  int32 comments_made = 13;
+  int32 shares_made = 14;
+  int32 saves_count = 15;
+  map<string, String> badges = 16;
+  string last_seen_reel = 17;
+  int64 last_seen_timestamp = 18;
+  bool is_premium = 19;
+  int64 created_at = 20;
+  int64 updated_at = 21;
+}
+
+// User preferences
+message UserPreferences {
+  bool auto_play = 1;
+  bool auto_scroll = 2;
+  bool show_comments = 3;
+  bool show_interactions = 4;
+  bool enable_notifications = 5;
+  bool enable_analytics = 6;
+  string video_quality = 7;
+  bool auto_prefetch = 8;
+  int max_prefetch_count = 9;
+  bool enable_hardware_acceleration = 10;
+  string theme = 11;
+  string language = 12;
+  map<string, String> notification_settings = 13;
+}
+
+// User statistics
+message UserStats {
+  int32 total_reels_viewed = 1;
+  int32 total_time_spent = 2;
+  double avg_watch_time = 3;
+  int32 reels_per_session = 4;
+  double scroll_speed = 5;
+  int32 interactions_per_session = 6;
+  double engagement_rate = 7;
+  map<string, int> interaction_breakdown = 8;
+  map<string, double> performance_metrics = 9;
+  int64 last_updated = 10;
+}
+
+// User activity tracking
+message UserActivity {
+  string user_id = 1;
+  string session_id = 2;
+  string action = 3;
+  map<string, any> data = 4;
+  int64 timestamp = 5;
+  string location = 6;
+  map<string, String> context = 7;
+}
+
+// User session
+message UserSession {
+  string id = 1;
+  string user_id = 2;
+  string device_id = 3;
+  string app_version = 4;
+  string os_version = 5;
+  string device_type = 6;
+  string ip_address = 7;
+  string user_agent = 8;
+  int64 created_at = 9;
+  int64 last_activity: 10;
+  bool is_active = 11;
+  map<string, String> metadata = 12;
+}
+
+// User connection event
+message UserConnectionEvent {
+  string user_id = 1;
+  string connection_id = 2;
+  string event_type = 3;
+  map<string, any> metadata = 4;
+  int64 timestamp = 5;
+}
+
+// User status
+message UserStatus {
+  string user_id = 1;
+  string status = 2;
+  map<string, String> metadata = 5;
+  int64 timestamp = 6;
+}
+
+// User metrics
+message UserMetrics {
+  string user_id = 1;
+  int32 connections = 2;
+  int32 messages_sent = 3;
+  int32 messages_received = 4;
+  int64 bytes_sent = 5;
+  int64 bytes_received = 6;
+  double avg_response_time = 7;
+  int64 error_count = 8;
+  int64 last_updated = 9;
+  map<string, any> performance_metrics = 10;
+}
+
+// User behavior pattern
+message UserBehaviorPattern {
+  string user_id = 1;
+  string pattern_type = 1;
+  map<string, double> metrics = 2;
+  int32 sample_count = 3;
+  double confidence = 4;
+  int64 last_updated = 5;
+  map<string, String> characteristics = 6;
+}
+
+// User interaction pattern
+message UserInteractionPattern {
+  string user_id = 1;
+  string interaction_type = 1;
+  double frequency = 2;
+  double avg_time_to_interaction = 3;
+  map<string, String> context = 4;
+  int32 sample_count = 5;
+  double confidence = 6;
+  int64 last_updated = 6;
+}
+
+// User scroll pattern
+message UserScrollPattern {
+  string user_id = 1;
+  double avg_speed = 2;
+  double peak_speed = 3;
+  double consistency = 3;
+  double direction_ratio = 4;
+  int32 scroll_count = 5;
+  int64 last_updated = 6;
+}
+
+// User watch pattern
+message UserWatchPattern {
+  string user_id = 1;
+  double avg_watch_time = 2;
+  double completion_rate = 3;
+  double engagement_score = 4;
+  int32 total_watched = 5;
+  int64 last_updated = 6;
+  map<String, String> content_preferences = 7;
+}
+
+// User demographic
+message UserDemographic {
+  string user_id = 1;
+  string age_group = 2;
+  string gender = 3;
+  string location = 4;
+  string language = 5;
+  string timezone = 6;
+  map<string, String> interests = 7;
+  map<string, String> device_info = 8;
+  int64 last_updated = 9;
+}
+
+// User social graph
+message UserSocialGraph {
+  string user_id = 1;
+  int32 followers_count = 1;
+  int32 following_count = 2;
+  int32 connections_count = 3;
+  map<string, String> close_friends = 4;
+  map<string, double> relationship_strength = 5;
+  int64 last_updated = 6;
+}
+
+// User notification settings
+message UserNotificationSettings {
+  string user_id = 1;
+  bool enable_push = 2;
+  bool enable_email = 3;
+  bool enable_sms = 4;
+  bool enable_in_app = 5;
+  bool enable_browser = 6;
+  map<string, String> notification_types = 7;
+  map<String, String> quiet_hours = 8;
+  int64 last_updated = 9;
+}
+
+// User privacy settings
+message UserPrivacySettings {
+  string user_id = 1;
+  bool allow_analytics = 2;
+  bool allow_personalization = 3;
+  bool allow_targeted_ads = 4;
+  bool allow_location = 5;
+  bool allow_camera_access = 6;
+  bool allow_microphone_access = 7;
+  bool allow_contacts_access = 8;
+  bool allow_photos_access = 9;
+  bool allow_videos_access = 10;
+  map<String, String> data_sharing = 11;
+  int64 last_updated = 12;
+}
+
+// User content preferences
+message UserContentPreferences {
+  string user_id = 1;
+  string preferred_video_quality = 2;
+  bool auto_play = 3;
+  bool auto_scroll = 4;
+  bool show_comments = 5;
+  bool show_interactions = 6;
+  bool show_thumbnails = 7;
+  bool show_progress_bar = 8;
+  bool enable_loop = 9;
+  string repeat_mode = 10;
+  map<String, String> content_filters = 11;
+  int64 last_updated = 12;
+}
+
+// User device information
+message UserDeviceInfo {
+  string user_id = 1;
+  string device_id = 2;
+  string device_type = 3;
+  string os_version = 4;
+  string app_version = 5;
+  string screen_resolution = 6;
+  string network_type = 7;
+  string carrier = 8;
+  string device_model = 9;
+  string browser = 10;
+  int32 cpu_cores = 11;
+  int memory_mb = 12;
+  int storage_gb = 13;
+  double battery_level = 14;
+  bool is_charging = 15;
+  bool is_wifi_connected = 16;
+  int64 last_updated = 17;
+}
+
+// User network information
+message UserNetworkInfo {
+  string user_id = 1;
+  string connection_type = 2;
+  string network_provider = 3;
+  string network_type = 4;
+  string signal_strength = 5;
+  double bandwidth_mbps = 6;
+  double latency_ms = 7;
+  int packet_loss = 8;
+  int64 last_updated = 9;
+}
+
+// User location information
+message UserLocationInfo {
+  string user_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  double altitude = 4;
+  string accuracy = 5;
+  string city = 6;
+  string country = 7;
+  string region = 8;
+  string postal_code = 9;
+  int64 last_updated = 10;
+}
+
+// User session analytics
+message UserSessionAnalytics {
+  string user_id = 1;
+  string session_id = 2;
+  int32 session_duration = 3;
+  int reels_viewed = 4;
+  int interactions = 5;
+  double scroll_distance = 6;
+  double avg_scroll_speed = 7;
+  double avg_watch_time = 8;
+  int bounce_rate = 9;
+  double engagement_rate = 10;
+  int64 last_updated = 11;
+  map<String, double> performance_metrics = 12;
+}
+
+// User performance metrics
+message UserPerformanceMetrics {
+  string user_id = 1;
+  double fps = 2;
+  double rendering_time_ms = 3;
+  double network_latency = 4;
+  double memory_usage_mb = 5;
+  double cpu_usage = 6;
+  double battery_drain = 7;
+  double thermal_state = 8;
+  int64 last_updated = 9;
+  map<String, double> device_metrics = 10;
+}

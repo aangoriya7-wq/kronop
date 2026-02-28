@@ -1,0 +1,37 @@
+{
+  "name": "gpu-memory-module",
+  "version": "1.0.0",
+  "description": "A JSI-based native module for GPU and memory monitoring in React Native",
+  "main": "js/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "react-native",
+    "jsi",
+    "gpu",
+    "memory",
+    "performance",
+    "native-module"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "@types/react-native": "*",
+    "typescript": "*"
+  },
+  "codegenConfig": {
+    "name": "GPUMemoryModuleSpec",
+    "type": "modules",
+    "jsSrcsDir": "js",
+    "android": {
+      "javaPackageName": "com.gpumemory"
+    }
+  }
+}

@@ -12,9 +12,21 @@ import {
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
-import { Story } from '../../types/story';
+// import { Story } from '../../types/story'; // Removed - types folder deleted
+
+// Define Story interface since types folder was deleted
+interface Story {
+  id: string;
+  imageUrl: string;
+  videoUrl?: string;
+  thumbnailUrl?: string;
+  duration?: number;
+  type: 'image' | 'video';
+  timestamp: Date;
+  viewed?: boolean;
+}
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import demoUserService from '../../services/demoUserService';
+// import demoUserService from '../../services/demoUserService'; // Removed - services folder deleted
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const STORY_BOX_WIDTH = 78;
@@ -125,8 +137,8 @@ export function StorySection({
       <View style={styles.container}>
         <View style={styles.emptyContainer}>
           <MaterialIcons name="photo-library" size={40} color={theme.colors.text.tertiary} />
-          <Text style={styles.emptyTitle}>{demoUserService.getDemoMessage('stories').title}</Text>
-          <Text style={styles.emptySubtitle}>{demoUserService.getDemoMessage('stories').subtitle}</Text>
+          <Text style={styles.emptyTitle}>Stories Coming Soon!</Text>
+          <Text style={styles.emptySubtitle}>Share your moments with friends</Text>
         </View>
       </View>
     );

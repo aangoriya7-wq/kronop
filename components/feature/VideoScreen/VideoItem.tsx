@@ -1,6 +1,21 @@
 import React from 'react';
-import { LongVideo } from '../../../services/longVideoService';
+// import { LongVideo } from '../../../services/longVideoService'; // Removed - services folder deleted
 import { VideoCard } from '../../../components/ui/VideoCard';
+
+// Define LongVideo interface since service was removed
+interface LongVideo {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  url?: string;
+  duration?: number;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  createdAt?: string;
+}
 
 interface VideoItemProps {
   video: LongVideo;

@@ -1,11 +1,16 @@
 import React, { memo, useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SongPlayer from './Player/song.js';
-import demoUserService from '../services/demoUserService';
+import SongPlayer from './Player/song';
+// import demoUserService from '../services/demoUserService'; // Removed - services folder deleted
 
 export default memo(function SongsScreen() {
-  const [demoMessage, setDemoMessage] = useState(demoUserService.getDemoMessage('songs'));
+  // const [demoMessage, setDemoMessage] = useState(demoUserService.getDemoMessage('songs')); // Removed - using mock
+  const [demoMessage, setDemoMessage] = useState({
+    title: 'Songs Feature Coming Soon!',
+    subtitle: 'Enjoy your favorite music tracks',
+    description: 'Music player will be available in the next update.'
+  });
 
   return (
     <SafeAreaView style={styles.container}>

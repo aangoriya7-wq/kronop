@@ -5,8 +5,19 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons, AntDesign, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeScreen } from '../../components/layout';
 import { theme } from '../../constants/theme';
-import { Photo } from '../../types/photo';
-import { getPhotosByCategory, getRelatedPhotos, photoCategories } from '../../services/photoService';
+// import { Photo } from '../../types/photo'; // Removed - types folder deleted
+
+// Define Photo interface since types folder was deleted
+interface Photo {
+  id: string;
+  url: string;
+  userAvatar: string;
+  userName: string;
+  title: string;
+  description: string;
+  likes: number;
+}
+// import { getPhotosByCategory, getRelatedPhotos, photoCategories } from '../../services/photoService'; // Removed - services folder deleted
 import CustomDiamondIcon from '../../components/icons/CustomDiamondIcon';
 
 const { width, height } = Dimensions.get('window');
@@ -17,17 +28,53 @@ export default function CategoryDetailScreen() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const categoryInfo = photoCategories.find(c => c.id === category);
+  // const categoryInfo = photoCategories.find(c => c.id === category); // Removed - using mock
+  // Mock category info
+  const categoryInfo = { 
+    id: category, 
+    name: category.charAt(0).toUpperCase() + category.slice(1),
+    icon: 'image' // Add icon property
+  };
 
   useEffect(() => {
     const loadPhotos = async () => {
       if (category) {
-        const data = await getPhotosByCategory(category as any);
-        setPhotos(data);
+        // const data = await getPhotosByCategory(category as any); // Removed - using mock
+        // Mock photos data
+        const mockPhotos: Photo[] = [
+          {
+            id: 'photo1',
+            url: 'https://picsum.photos/seed/photo1/400/600.jpg',
+            userAvatar: 'https://picsum.photos/seed/avatar1/40/40.jpg',
+            userName: 'John Doe',
+            title: 'Mock Photo 1',
+            description: 'This is a mock photo',
+            likes: 42
+          },
+          {
+            id: 'photo2',
+            url: 'https://picsum.photos/seed/photo2/400/600.jpg',
+            userAvatar: 'https://picsum.photos/seed/avatar2/40/40.jpg',
+            userName: 'Jane Smith',
+            title: 'Mock Photo 2',
+            description: 'This is another mock photo',
+            likes: 38
+          },
+          {
+            id: 'photo3',
+            url: 'https://picsum.photos/seed/photo3/400/600.jpg',
+            userAvatar: 'https://picsum.photos/seed/avatar3/40/40.jpg',
+            userName: 'Mike Johnson',
+            title: 'Mock Photo 3',
+            description: 'This is a third mock photo',
+            likes: 56
+          }
+        ];
+        setPhotos(mockPhotos);
         
-        // Find initial index based on photoId
+        // Find initial index based on photoId - Removed - using mock
         if (photoId) {
-          const index = data.findIndex(photo => photo.id === photoId);
+          const index = mockPhotos.findIndex(photo => photo.id === photoId);
           if (index !== -1) {
             setCurrentIndex(index);
           }

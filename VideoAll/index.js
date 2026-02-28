@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
-import { useLongVideos } from '../hooks/useLongVideos';
 import VideoItem from './VideoItem';
 import SearchEngine from './SearchEngine';
 import { videoAllSystem } from './VideoAllSystem'; // VideoAll system background service
@@ -12,7 +11,7 @@ import { videoAllSystem } from './VideoAllSystem'; // VideoAll system background
 export default function LongVideosScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const videos = useLongVideos();
+  const [videos, setVideos] = useState([]);
   const [systemReady, setSystemReady] = useState(false);
 
   // Sample search data for SearchEngine
@@ -31,10 +30,17 @@ export default function LongVideosScreen() {
     console.log('Selected:', item);
   };
 
-  // VideoAll System ko background mein initialize karo
+  // Load videos and initialize VideoAll System
   useEffect(() => {
     const initVideoAll = async () => {
       try {
+        // Load videos from API
+        const response = await fetch('http://localhost:3000/api/videos');
+        const result = await response.json();
+        if (result.success && result.data) {
+          setVideos(result.data);
+        }
+
         // VideoAll system background mein chalta rahega
         await videoAllSystem.initialize({
           languages: ['hindi', 'english', 'tamil', 'telugu', 'bengali', 'marathi', 'gujarati', 'punjabi', 'urdu'],

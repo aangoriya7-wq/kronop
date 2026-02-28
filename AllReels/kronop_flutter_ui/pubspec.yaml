@@ -1,0 +1,65 @@
+name: kronop_flutter_ui
+description: High-performance Flutter UI for Reels app with Rust decoder integration
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # FFI for Rust integration
+  ffi: ^2.1.0
+  
+  # High-performance rendering
+  texture: ^2.1.0
+  custom_paint: ^1.0.0
+  
+  # WebSocket for Node.js bridge
+  web_socket_channel: ^2.4.0
+  
+  # State management
+  provider: ^6.1.0
+  
+  # Performance monitoring
+  devicelocale: ^0.7.0
+  
+  # Image handling
+  flutter_image: ^4.1.0
+  
+  # Animation
+  flutter_animate: ^4.5.0
+  
+  # Platform channels
+  platform: ^3.1.0
+  
+  # JSON handling
+  json_annotation: ^4.8.1
+  
+  # Logging
+  logging: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  json_serializable: ^6.7.1
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+  
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
