@@ -14,6 +14,7 @@ import {
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 
 const mockUserData = {
   displayName: 'John Doe',
@@ -134,6 +135,59 @@ export default function ProfileScreen() {
     router.push('/menu' as any);
   };
 
+  const pickImageFromGallery = async (isCover: boolean = false) => {
+    try {
+      // Request media library permissions
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (!permissionResult.granted) {
+        Alert.alert('Permission Required', 'Please allow access to your photos to change your profile picture.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: isCover ? [16, 9] : [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const imageUri = result.assets[0].uri;
+        
+        // Basic validation
+        const fileName = result.assets[0].fileName || '';
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        if (!extension || !allowedExtensions.includes(extension)) {
+          Alert.alert('Invalid File', 'Please select a valid image file. Allowed: JPG, PNG, GIF, WebP');
+          return;
+        }
+
+        // File size validation
+        const MAX_SIZE = isCover ? 5 * 1024 * 1024 : 2 * 1024 * 1024; // 5MB for cover, 2MB for logo
+        if (result.assets[0].fileSize && result.assets[0].fileSize > MAX_SIZE) {
+          Alert.alert('File Too Large', `Image file must be less than ${isCover ? '5MB' : '2MB'}`);
+          return;
+        }
+
+        // Update the appropriate image
+        if (isCover) {
+          setEditData(prev => ({ ...prev, coverPhoto: imageUri }));
+          setUserData(prev => ({ ...prev, coverPhoto: imageUri }));
+        } else {
+          setUserData(prev => ({ ...prev, avatar: imageUri }));
+        }
+
+        Alert.alert('Success', `${isCover ? 'Cover photo' : 'Profile picture'} updated successfully!`);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'video':
@@ -211,15 +265,19 @@ export default function ProfileScreen() {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Cover Photo */}
-        <View style={styles.coverPhotoContainer}>
+        <TouchableOpacity 
+          style={styles.coverPhotoContainer}
+          onPress={() => isEditing && pickImageFromGallery(true)}
+          disabled={!isEditing}
+        >
           <Image source={{ uri: userData.coverPhoto }} style={styles.coverPhoto} />
           {isEditing && (
-            <TouchableOpacity style={styles.changeCoverButton}>
+            <TouchableOpacity style={styles.changeCoverButton} onPress={() => pickImageFromGallery(true)}>
               <Ionicons name="camera" size={20} color="#fff" />
               <Text style={styles.changeCoverText}>Change Cover</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </TouchableOpacity>
 
         {/* User Info Section */}
         <View style={styles.userInfoSection}>
@@ -260,9 +318,11 @@ export default function ProfileScreen() {
           </View>
           
           <View style={styles.profilePictureContainer}>
-            <Image source={{ uri: userData.avatar }} style={styles.profilePicture} />
+            <TouchableOpacity onPress={() => isEditing && pickImageFromGallery(false)} disabled={!isEditing}>
+              <Image source={{ uri: userData.avatar }} style={styles.profilePicture} />
+            </TouchableOpacity>
             {isEditing && (
-              <TouchableOpacity style={styles.changePhotoButton}>
+              <TouchableOpacity style={styles.changePhotoButton} onPress={() => pickImageFromGallery(false)}>
                 <Ionicons name="camera" size={16} color="#fff" />
               </TouchableOpacity>
             )}

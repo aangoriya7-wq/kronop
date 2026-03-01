@@ -9,7 +9,7 @@ interface Comment {
 }
 
 // Elixir connection
-const ELIXIR_BASE_URL = 'http://localhost:4000/api/v1';
+const ELIXIR_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ? `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1` : 'https://kronop-9gju.onrender.com/api/v1';
 
 // Mock comments data (fallback)
 const mockComments: Record<string, Comment[]> = {

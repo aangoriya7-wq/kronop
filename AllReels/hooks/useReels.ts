@@ -1,6 +1,6 @@
 // Reels state management hook
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Reel, getReels } from '../services/videoService';
 import { toggleStar, toggleSave, toggleSupport, incrementComments, incrementShares, shareReel } from '../services/actions';
 import { getComments, addComment } from '../services/actions/commentService';
@@ -14,12 +14,29 @@ interface Comment {
 }
 
 export function useReels() {
-  const [reels, setReels] = useState<Reel[]>(getReels());
+  const [reels, setReels] = useState<Reel[]>([]);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [activeReelId, setActiveReelId] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [currentReelIndex, setCurrentReelIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load reels on mount
+  useEffect(() => {
+    const loadReels = async () => {
+      setIsLoading(true);
+      try {
+        const reelsData = await getReels();
+        setReels(reelsData);
+      } catch (error) {
+        console.error('Error loading reels:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadReels();
+  }, []);
 
   const handleStar = useCallback(async (reelId: string) => {
     setIsLoading(true);

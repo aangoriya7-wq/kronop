@@ -1,4 +1,7 @@
-// Video data service - Mock reels data
+// Video data service - Real reels data from server
+
+import { API_ENDPOINTS, fetchWithTimeout, handleApiError } from './apiConfig';
+import { generateReelUrls } from './r2Config';
 
 export interface Reel {
   id: string;
@@ -22,12 +25,11 @@ export interface Reel {
   likes: number;
 }
 
-// Mock video URLs (using free video hosting)
+// Mock data as fallback only - NOW USING R2 URLs
 const mockReels: Reel[] = [
   {
     id: '1',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    thumbnailUrl: 'https://picsum.photos/seed/reel1/400/700.jpg',
+    ...generateReelUrls('1'),
     username: 'creator_one',
     description: 'Amazing sunset vibes 🌅 #nature #sunset',
     songName: 'Summer Breeze - Chill Vibes',
@@ -47,8 +49,7 @@ const mockReels: Reel[] = [
   },
   {
     id: '2',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    thumbnailUrl: 'https://picsum.photos/seed/reel2/400/700.jpg',
+    ...generateReelUrls('2'),
     username: 'creative_soul',
     description: 'Dream big, create bigger ✨ #motivation #art',
     songName: 'Epic Dreams - Motivational Mix',
@@ -68,8 +69,7 @@ const mockReels: Reel[] = [
   },
   {
     id: '3',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    thumbnailUrl: 'https://picsum.photos/seed/reel3/400/700.jpg',
+    ...generateReelUrls('3'),
     username: 'adventure_seeker',
     description: 'Life is an adventure 🔥 #travel #explore',
     songName: 'Wild Fire - Adventure Beat',
@@ -89,8 +89,7 @@ const mockReels: Reel[] = [
   },
   {
     id: '4',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    thumbnailUrl: 'https://picsum.photos/seed/reel4/400/700.jpg',
+    ...generateReelUrls('4'),
     username: 'wanderlust_diaries',
     description: 'Escape to paradise 🌴 #beach #vacation',
     songName: 'Island Escape - Tropical Waves',
@@ -110,8 +109,7 @@ const mockReels: Reel[] = [
   },
   {
     id: '5',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    thumbnailUrl: 'https://picsum.photos/seed/reel5/400/700.jpg',
+    ...generateReelUrls('5'),
     username: 'fun_times',
     description: 'Good vibes only 😎 #fun #happy',
     songName: 'Party Anthem - Feel Good Mix',
@@ -131,6 +129,64 @@ const mockReels: Reel[] = [
   },
 ];
 
-export function getReels(): Reel[] {
-  return mockReels;
+// Fetch real reels from server
+export async function getReels(): Promise<Reel[]> {
+  try {
+    const response = await fetchWithTimeout(API_ENDPOINTS.REELS);
+
+    if (!response.ok) {
+      return mockReels;
+    }
+
+    const reels = await response.json();
+    return reels;
+  } catch (error) {
+    handleApiError(error);
+    return mockReels;
+  }
+}
+
+// Fetch single reel by ID
+export async function getReelById(id: string): Promise<Reel | null> {
+  try {
+    const response = await fetchWithTimeout(API_ENDPOINTS.REEL_BY_ID(id));
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    return mockReels.find(reel => reel.id === id) || null;
+  }
+}
+
+// Search reels
+export async function searchReels(query: string): Promise<Reel[]> {
+  try {
+    const response = await fetchWithTimeout(API_ENDPOINTS.SEARCH_REELS(query));
+
+    if (!response.ok) {
+      return [];
+    }
+
+    return await response.json();
+  } catch (error) {
+    return [];
+  }
+}
+
+// Get trending reels
+export async function getTrendingReels(): Promise<Reel[]> {
+  try {
+    const response = await fetchWithTimeout(API_ENDPOINTS.TRENDING_REELS);
+
+    if (!response.ok) {
+      return mockReels.slice(0, 3); // Return first 3 mock reels as fallback
+    }
+
+    return await response.json();
+  } catch (error) {
+    return mockReels.slice(0, 3);
+  }
 }

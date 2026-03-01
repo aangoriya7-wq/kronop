@@ -52,6 +52,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="optimized-index"
+        options={{
+          title: 'Optimized',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="speed" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

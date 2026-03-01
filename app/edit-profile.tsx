@@ -61,16 +61,67 @@ export default function EditProfileScreen() {
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
+      Alert.alert(
+        'Change Profile Photo',
+        'Choose an option to update your profile photo',
+        [
+          {
+            text: 'Gallery',
+            onPress: async () => {
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+              });
 
-      if (!result.canceled && result.assets[0]) {
-        setAvatar(result.assets[0].uri);
-      }
+              if (!result.canceled && result.assets[0]) {
+                const imageUri = result.assets[0].uri;
+                
+                // Basic validation
+                const fileName = result.assets[0].fileName || '';
+                const extension = fileName.split('.').pop()?.toLowerCase();
+                const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                
+                if (!extension || !allowedExtensions.includes(extension)) {
+                  Alert.alert('Invalid File', 'Please select a valid image file. Allowed: JPG, PNG, GIF, WebP');
+                  return;
+                }
+
+                // File size validation
+                const MAX_SIZE = 2 * 1024 * 1024; // 2MB for profile picture
+                if (result.assets[0].fileSize && result.assets[0].fileSize > MAX_SIZE) {
+                  Alert.alert('File Too Large', 'Image file must be less than 2MB');
+                  return;
+                }
+
+                setAvatar(imageUri);
+                Alert.alert('Success', 'Profile picture updated successfully!');
+              }
+            }
+          },
+          {
+            text: 'Camera',
+            onPress: async () => {
+              const cameraResult = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+              });
+
+              if (!cameraResult.canceled && cameraResult.assets[0]) {
+                setAvatar(cameraResult.assets[0].uri);
+                Alert.alert('Success', 'Profile picture updated successfully!');
+              }
+            }
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]
+      );
     } catch (error) {
       console.error('Image picker error:', error);
       Alert.alert('Error', 'Failed to pick image');
