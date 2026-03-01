@@ -478,10 +478,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 40,
+    paddingVertical: 25,
     borderBottomWidth: 1,
     borderBottomColor: '#1A1A1A',
-    marginTop: -30,
+    marginTop: -25,
   },
   userTextContainer: {
     flex: 1,
@@ -541,6 +541,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderWidth: 3,
     borderColor: '#000000',
+    backgroundColor: '#1A1A1A',
   },
   changePhotoButton: {
     position: 'absolute',
@@ -557,7 +558,7 @@ const styles = StyleSheet.create({
   },
   statsSection: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#1A1A1A',
   },
