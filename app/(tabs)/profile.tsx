@@ -127,8 +127,8 @@ export default function ProfileScreen() {
   };
 
   const handleSupporterPress = () => {
-    // Open help center which uses GroqAIService
-    router.push('/help-center' as any);
+    // Navigate to src SupportScreen
+    router.push('/support' as any);
   };
 
   const handleMenuPress = () => {

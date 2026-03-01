@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Platform, Modal, Dimensions, TextInput, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Platform, Modal, Dimensions, TextInput, Alert, Linking } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -17,14 +17,14 @@ import HeaderButton from '../../components/common/HeaderButton';
 import StoryUpload from '../../components/upload/StoryUpload';
 import PhotoUpload from '../../components/upload/PhotoUpload';
 // import ReelsUpload from '../../components/upload/ReelsUpload'; // Removed - now using AllReels
-import VideoUpload from '../../components/upload/VideoUpload';
+// import VideoUpload from '../../components/upload/VideoUpload'; // Removed - now using AllVideo app
 import LiveUpload from '../../components/upload/LiveUpload';
 import SongUpload from '../../components/upload/SongUpload';
 
 // Bridge imports
 import BridgeStory from '../../components/uploadBridge/bridge-story';
 import BridgePhoto from '../../components/uploadBridge/bridge-photo';
-import BridgeVideo from '../../components/uploadBridge/bridge-video';
+// import BridgeVideo from '../../components/uploadBridge/bridge-video'; // Removed - now using AllVideo app
 import BridgeLive from '../../components/uploadBridge/bridge-live';
 import BridgeSongs from '../../components/uploadBridge/bridge-songs';
 
@@ -371,6 +371,21 @@ export default function HomeScreen() {
   const handleMusicPress = () => setShowMusicModal(true);
   const handleUploadPress = () => setShowUploadModal(true);
 
+  const launchAllVideoApp = async () => {
+    try {
+      // Try to open the AllVideo app using deep link
+      await Linking.openURL('kronopallvideo://');
+    } catch (error) {
+      console.log('Error launching AllVideo app:', error);
+      // Fallback: open app store or show message
+      Alert.alert(
+        'AllVideo App Not Found',
+        'Please install the AllVideo app to access long videos.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
   const handleUploadOptionPress = (option: string) => {
     setShowUploadModal(false);
     setSelectedUploadScreen(option);
@@ -690,10 +705,10 @@ export default function HomeScreen() {
               
               <TouchableOpacity 
                 style={styles.uploadOption}
-                onPress={() => handleUploadOptionPress('Video')}
+                onPress={launchAllVideoApp}
               >
                 <Ionicons name="videocam" size={24} color="#6A5ACD" />
-                <Text style={styles.uploadOptionText}>Video</Text>
+                <Text style={styles.uploadOptionText}>Long Video</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
@@ -784,7 +799,7 @@ export default function HomeScreen() {
               {selectedUploadScreen === 'Story' && 'Story Upload'}
               {selectedUploadScreen === 'Photo' && 'Photo Upload'}
               {selectedUploadScreen === 'Reels' && 'Reels Upload'}
-              {selectedUploadScreen === 'Video' && 'Video Upload'}
+              {/* Video upload removed - now using AllVideo app */}
               {selectedUploadScreen === 'Live' && 'Live Upload'}
               {selectedUploadScreen === 'Song' && 'Song Upload'}
             </Text>
@@ -797,7 +812,7 @@ export default function HomeScreen() {
             {selectedUploadScreen === 'Story' && <BridgeStory onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Photo' && <BridgePhoto onClose={() => setSelectedUploadScreen(null)} />}
             {/* {selectedUploadScreen === 'Reels' && <BridgeReels onClose={() => setSelectedUploadScreen(null)} />} */} {/* Removed - now using AllReels */}
-            {selectedUploadScreen === 'Video' && <BridgeVideo onClose={() => setSelectedUploadScreen(null)} />}
+            {/* Video upload removed - now using AllVideo app */}
             {selectedUploadScreen === 'Live' && <BridgeLive onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Song' && <BridgeSongs onClose={() => setSelectedUploadScreen(null)} />}
           </View>

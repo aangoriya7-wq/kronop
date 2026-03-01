@@ -61,14 +61,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Sparkles size={24} color={color} strokeWidth={2} />,
           }}
         />
-        <Tabs.Screen
-          name="video"
-          options={{
-            title: 'Video',
-            tabBarIcon: ({ color }) => <Play size={24} color={color} strokeWidth={2} />,
-          }}
-        />
-        {/* --- 1. LIVE SECTION --- */}
+                {/* --- 1. LIVE SECTION --- */}
         <Tabs.Screen
           name="live"
           options={{

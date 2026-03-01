@@ -1,0 +1,14 @@
+# Kronop Video Platform - Kubernetes Namespace
+# Production environment for 500M+ users
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kronop-production
+  labels:
+    name: kronop-production
+    environment: production
+    tier: critical
+  annotations:
+    description: "Kronop Video Platform Production Namespace"
+    owner: "kronop-team"
+    created-by: "kubernetes-deployment"

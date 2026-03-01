@@ -1,0 +1,56 @@
+# Air configuration for hot reload in development
+
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  # Just plain old shell command. You could use 'make' if needed
+  cmd = "go build -o ./tmp/main ./cmd/server"
+  # Binary file yields from `cmd`.
+  bin = "tmp/main"
+  # Watch these filename extensions.
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  # Ignore these filename extensions or directories.
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "data", "logs"]
+  # Watch these directories if you specified.
+  include_dir = []
+  # Exclude files.
+  exclude_file = []
+  # Exclude specific regular expressions.
+  exclude_regex = ["_test.go"]
+  # Exclude unchanged files.
+  exclude_unchanged = true
+  # Follow symlink for directories
+  follow_symlink = true
+  # This log file places in your tmp_dir.
+  log = "air.log"
+  # Poll files for changes instead of using fsnotify.
+  poll = false
+  # Poll interval (if enabled).
+  poll_interval = 1000 # ms
+  # Enable live reload
+  live_reload = true
+  # Delay before sending live reload signal
+  live_reload_delay = 200 # ms
+
+[log]
+  # Show log time
+  time = true
+  # Only show main log (silences watcher, build, runner)
+  main_only = false
+
+[color]
+  # Customize each part's color. If no color found, use the application default.
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  # Delete tmp directory on exit
+  clean_on_exit = false
+
+[screen]
+  clear_on_rebuild = true
+  keep_scroll = true

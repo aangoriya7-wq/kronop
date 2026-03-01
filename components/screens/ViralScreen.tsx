@@ -267,9 +267,9 @@ export default function ViralScreen() {
         activeOpacity={0.8}
         onPress={() => {
           if (item.type === 'video') {
-            router.push(`/video/${item.id}`);
+            router.push({ pathname: '/video', params: { id: item.id } } as any);
           } else {
-            router.push(`/photos/${item.id}`);
+            router.push({ pathname: '/photos', params: { id: item.id } } as any);
           }
         }}
       >

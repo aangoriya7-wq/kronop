@@ -13,7 +13,10 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to personalize content and services.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to personalize content and services."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to personalize content and services.",
+        "NSCameraUsageDescription": "This app uses the camera to take photos for support.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your photos to share them with support.",
+        "NSPhotoLibraryAddUsageDescription": "This app saves photos to your library."
       }
     },
     "android": {
@@ -27,10 +30,9 @@
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
-        "RECORD_AUDIO",
-        "MODIFY_AUDIO_SETTINGS",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
