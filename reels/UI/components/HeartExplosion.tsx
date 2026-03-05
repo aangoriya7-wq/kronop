@@ -6,7 +6,7 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
-import { useSharedValue, useAnimatedStyle, withSequence, withTiming, withDelay, runOnJS } from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withSequence, withTiming, runOnJS } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -123,7 +123,7 @@ const HeartExplosionComponent: React.FC<HeartExplosionProps> = ({ onComplete }) 
               transform: [
                 { rotate: `${particle.rotation}deg` },
                 { scale: particle.scale },
-              ] as any,
+              ],
               opacity: particle.opacity,
             },
           ]}

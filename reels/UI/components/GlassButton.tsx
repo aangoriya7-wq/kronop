@@ -57,7 +57,7 @@ const GlassButton: React.FC<GlassButtonProps> = ({
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value } as any],
+    transform: [{ scale: scale.value }],
     opacity: opacity.value,
   }));
 
