@@ -59,7 +59,7 @@ export default function TabLayout() {
           name="Reels"
           options={{
             title: 'Reels',
-            tabBarIcon: ({ color }) => <Ionicons name="videocam-outline" size={26} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="play-outline" size={26} color={color} />,
           }}
         />
          {/* --- 1. LIVE SECTION --- */}
@@ -67,7 +67,7 @@ export default function TabLayout() {
           name="live"
           options={{
             title: 'Live',
-            tabBarIcon: ({ color }) => <Ionicons name="radio" size={26} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="radio-outline" size={26} color={color} />,
           }}
         />
         {/* --- 2. DATABASE SECTION - MOVED BETWEEN LIVE AND PROFILE --- */}
