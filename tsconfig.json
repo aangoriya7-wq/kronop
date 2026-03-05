@@ -45,6 +45,9 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "types/**/*.d.ts",
-    "services/**/*.d.ts"
-, "app/Player/song.js"  ]
+    "services/**/*.d.ts",
+    "config/**/*.ts",
+    "config/**/*.js",
+    "app/Player/song.js"
+  ],
 }
