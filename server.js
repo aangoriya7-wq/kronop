@@ -142,11 +142,10 @@ app.get('/debug/database', async (req, res) => {
         Content.countDocuments({ is_active: true }),
         Content.countDocuments({ type: 'Photo', is_active: true }),
         Content.countDocuments({ type: 'Video', is_active: true }),
-        Content.countDocuments({ type: 'Reel', is_active: true }),
         Content.countDocuments({ type: 'Story', is_active: true })
       ]);
       
-      debug.content = { total: counts[0], photos: counts[1], videos: counts[2], /* reels: counts[3], */ stories: counts[3] };
+      debug.content = { total: counts[0], photos: counts[1], videos: counts[2], stories: counts[3] };
     }
     
     res.json({ success: true, debug });
@@ -360,7 +359,6 @@ app.post('/upload/url', async (req, res) => {
     
     let uploadUrl, contentId;
     const contentTypes = {
-      // reel: { libraryId: '593793', api: 'video' }, // Removed - now using AllReels system
       video: { libraryId: '593795', api: 'video' },
       live: { libraryId: '594452', api: 'video' },
       photo: { zone: 'photu', api: 'storage' },
@@ -441,7 +439,6 @@ const sendBroadcastUploadNotification = async (uploadType, contentDoc) => {
       live: { title: 'Live शुरू हो गया!', body: 'जल्दी आओ! कोई लाइव आया है! 🔴' },
       story: { title: 'नई स्टोरी!', body: 'किसी ने अभी नई स्टोरी डाली है, देखो अभी! 📸' },
       photo: { title: 'नई फोटो!', body: 'नई फोटो अपलोड हुई है—देखो अभी! 🖼️' },
-      // reel: { title: 'नई रील!', body: 'नई रील आई है—मज़ा आएगा, अभी देखें! 🎬' }, // Removed - now using AllReels system
       video: { title: 'नई वीडियो!', body: 'नई वीडियो अपलोड हुई है—अभी प्ले करें! ▶️' }
     };
     
@@ -603,7 +600,7 @@ const server = app.listen(PORT, HOST, async () => {
 });
 
 // Delete endpoints for cleanup
-['videos', 'photos', 'shayari', 'stories'].forEach(type => { // Removed 'reels' - now using AllReels system
+['videos', 'photos', 'shayari', 'stories'].forEach(type => {
   app.delete(`/api/${type}/:id`, async (req, res) => {
     try {
       const result = await Content.deleteOne({ _id: req.params.id, type: type.charAt(0).toUpperCase() + type.slice(1, -1) });

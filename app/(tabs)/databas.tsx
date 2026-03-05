@@ -56,8 +56,6 @@ export default function UserDataScreen() {
   });
 
   const [sections, setSections] = useState<SectionData[]>([
-    { name: 'Video Tool', screen: 'VideoTool', icon: 'videocam', stats: { total: 0, stars: 0, comments: 0, shares: 0, views: 0 } },
-    { name: 'Reels Tool', screen: 'ReelsTool', icon: 'movie', stats: { total: 0, stars: 0, comments: 0, shares: 0, views: 0 } },
     { name: 'Photo Tool', screen: 'PhotoTool', icon: 'photo', stats: { total: 0, stars: 0, comments: 0, shares: 0, views: 0 } },
     { name: 'Story Tool', screen: 'StoryTool', icon: 'auto-stories', stats: { total: 0, stars: 0, comments: 0, shares: 0, views: 0 } },
     { name: 'Live Tool', screen: 'LiveTool', icon: 'live-tv', stats: { total: 0, stars: 0, comments: 0, shares: 0, views: 0 } },
@@ -119,14 +117,11 @@ export default function UserDataScreen() {
   const handleSectionPress = (section: SectionData) => {
     // Navigate to respective screen with data using Expo Router
     const screenMap: Record<string, string> = {
-      'VideoTool': '/Databes/VideoToolScreen',
-      'ReelsTool': '/Databes/ReelsToolScreen',
       'PhotoTool': '/Databes/PhotoToolScreen',
       'StoryTool': '/Databes/StoryToolScreen',
       'LiveTool': '/Databes/LiveToolScreen',
       'SongTool': '/Databes/SongToolScreen',
       'BankAccount': '/Databes/BankAccount',
-      'video/[id]': '/video/[id]',
     };
 
     const route = screenMap[section.screen];

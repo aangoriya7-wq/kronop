@@ -289,26 +289,8 @@ export default function RootLayout() {
                 }} 
               />
 
-              <Stack.Screen 
-                name="Databes/ReelsToolScreen" 
-                options={{ 
-                  headerShown: false,
-                  animation: 'none',
-                  presentation: 'modal',
-                  contentStyle: { backgroundColor: '#000' }
-                }} 
-              />
-
-              <Stack.Screen 
-                name="Databes/VideoToolScreen" 
-                options={{ 
-                  headerShown: false,
-                  animation: 'none',
-                  presentation: 'modal',
-                  contentStyle: { backgroundColor: '#000' }
-                }} 
-              />
-
+              
+              
               <Stack.Screen 
                 name="Databes/PhotoToolScreen" 
                 options={{ 

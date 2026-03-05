@@ -80,7 +80,6 @@ async function runTests() {
   // Test Content APIs
   console.log('📺 Testing Content APIs...');
   await testEndpoint('GET', '/content', null, 'Get All Content');
-  await testEndpoint('GET', '/content/reels', null, 'Get Reels');
   await testEndpoint('GET', '/content/video', null, 'Get Videos');
   await testEndpoint('GET', '/content/live', null, 'Get Live Streams');
   await testEndpoint('GET', '/content/photo', null, 'Get Photos');

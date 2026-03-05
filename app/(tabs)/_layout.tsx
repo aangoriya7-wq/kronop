@@ -54,21 +54,15 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Home size={24} color={color} strokeWidth={2} />,
           }}
         />
+        {/* --- REELS SECTION --- */}
         <Tabs.Screen
-          name="reels"
+          name="Reels"
           options={{
             title: 'Reels',
-            tabBarIcon: ({ color }) => <Sparkles size={24} color={color} strokeWidth={2} />,
+            tabBarIcon: ({ color }) => <Ionicons name="videocam-outline" size={26} color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="video"
-          options={{
-            title: 'Video',
-            tabBarIcon: ({ color }) => <Play size={24} color={color} strokeWidth={2} />,
-          }}
-        />
-        {/* --- 1. LIVE SECTION --- */}
+         {/* --- 1. LIVE SECTION --- */}
         <Tabs.Screen
           name="live"
           options={{

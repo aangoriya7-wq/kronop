@@ -44,20 +44,6 @@ const saveUserPhoto = async (req, res) => {
     }
 };
 
-// Add missing getUserReels - NOW PUBLIC!
-const getUserReels = async (req, res) => {
-    try {
-        
-        const reels = await Content.find({ 
-            type: 'Reel'
-        }).sort({ created_at: -1 }).limit(100);
-
-        res.json({ success: true, data: reels });
-    } catch (error) {
-        console.error('❌ Public getUserReels error:', error);
-        res.status(500).json({ error: error.message });
-    }
-};
 
 // Add missing getUserVideos - NOW PUBLIC!
 const getUserVideos = async (req, res) => {
@@ -117,7 +103,6 @@ const getUserShayariPhotos = async (req, res) => {
 module.exports = {
     getUserPhotos,
     saveUserPhoto,
-    getUserReels,
     getUserVideos,
     getUserStories,
     getUserShayariPhotos

@@ -44,14 +44,3 @@ export const MOCK_VIDEOS = Array(10).fill(null).map((_, i) => ({
     avatar: 'https://via.placeholder.com/50'
   }
 }));
-
-export const MOCK_REELS = Array(10).fill(null).map((_, i) => ({
-  id: `reel_${i}`,
-  thumbnail: `https://via.placeholder.com/400x700/000000/FFFFFF?text=Reel+${i+1}`,
-  title: `Reel ${i+1}`,
-  likes: 500,
-  user: {
-    username: 'Demo User',
-    avatar: 'https://via.placeholder.com/50'
-  }
-}));

@@ -75,25 +75,6 @@ const userSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
-  seen_reels: [{
-    reel_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Content',
-      required: true
-    },
-    viewed_at: {
-      type: Date,
-      default: Date.now
-    },
-    view_duration: {
-      type: Number, // in seconds
-      default: 0
-    },
-    completed: {
-      type: Boolean,
-      default: false
-    }
-  }],
   createdAt: {
     type: Date,
     default: Date.now

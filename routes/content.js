@@ -26,81 +26,12 @@ router.get('/video', contentController.getUserVideos);
 // GET /content/videos (ALIAS for /content/video)
 router.get('/videos', contentController.getUserVideos);
 
-// GET /content/reels (PUBLIC - for all reels)
-router.get('/reels', contentController.getUserReels);
-
-// GET /content/reels/public (ALIAS for /content/reels)
-router.get('/reels/public', contentController.getUserReels);
 
 // GET /content/story (PUBLIC)
 router.get('/story', contentController.getUserStories);
 
 // GET /content/shayari-photo (PUBLIC - for all shayari photos)
 router.get('/shayari-photo', contentController.getUserShayariPhotos);
-
-// POST /content/reels/upload (PUBLIC - no auth required)
-router.post('/reels/upload', upload.single('video'), async (req, res) => {
-  try {
-    // Public upload - no authentication required
-    const { title, description, tags, location } = req.body;
-    const videoFile = req.file;
-    
-    if (!videoFile) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Video file is required' 
-      });
-    }
-    
-    // Parse tags if provided as string
-    let parsedTags = [];
-    if (tags) {
-      try {
-        parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
-      } catch (e) {
-        parsedTags = tags.split(',').map(tag => tag.trim());
-      }
-    }
-    
-    // Parse location if provided
-    let parsedLocation = null;
-    if (location) {
-      try {
-        parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
-      } catch (e) {
-        // Default location if parsing fails
-        parsedLocation = { type: 'Point', coordinates: [0, 0] };
-      }
-    }
-    
-    // For now, return a test response without actual upload
-    // TODO: Implement actual upload with ReelsBridge
-    const testResult = {
-      id: 'test_' + Date.now(),
-      title: title || 'Untitled Reel',
-      description: description || '',
-      tags: parsedTags,
-      location: parsedLocation,
-      userId: 'guest_user',
-      uploadDate: new Date(),
-      status: 'test_mode',
-      message: 'Public upload endpoint working - BunnyCDN upload pending'
-    };
-    
-    res.json({ 
-      success: true, 
-      message: 'Reel upload test successful',
-      data: testResult 
-    });
-    
-  } catch (error) {
-    console.error('Reel upload error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
-    });
-  }
-});
 
 // POST /content/video/upload (PUBLIC - no auth required)
 router.post('/video/upload', upload.single('video'), async (req, res) => {

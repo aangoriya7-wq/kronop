@@ -16,14 +16,15 @@ import AppLogo from '../../components/common/AppLogo';
 import HeaderButton from '../../components/common/HeaderButton';
 import StoryUpload from '../../components/upload/StoryUpload';
 import PhotoUpload from '../../components/upload/PhotoUpload';
-// import ReelsUpload from '../../components/upload/ReelsUpload'; // Removed - now using AllReels
 import VideoUpload from '../../components/upload/VideoUpload';
+import ReelsUpload from '../../components/upload/ReelsUpload';
 import LiveUpload from '../../components/upload/LiveUpload';
 import SongUpload from '../../components/upload/SongUpload';
 
 // Bridge imports
 import BridgeStory from '../../components/uploadBridge/bridge-story';
 import BridgePhoto from '../../components/uploadBridge/bridge-photo';
+import BridgeReels from '../../components/uploadBridge/bridge-reels';
 import BridgeVideo from '../../components/uploadBridge/bridge-video';
 import BridgeLive from '../../components/uploadBridge/bridge-live';
 import BridgeSongs from '../../components/uploadBridge/bridge-songs';
@@ -688,7 +689,7 @@ export default function HomeScreen() {
                 <Text style={styles.uploadOptionText}>Reels</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity 
+                            <TouchableOpacity 
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Video')}
               >
@@ -796,7 +797,7 @@ export default function HomeScreen() {
           <View style={styles.uploadScreenContainer}>
             {selectedUploadScreen === 'Story' && <BridgeStory onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Photo' && <BridgePhoto onClose={() => setSelectedUploadScreen(null)} />}
-            {/* {selectedUploadScreen === 'Reels' && <BridgeReels onClose={() => setSelectedUploadScreen(null)} />} */} {/* Removed - now using AllReels */}
+            {selectedUploadScreen === 'Reels' && <BridgeReels onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Video' && <BridgeVideo onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Live' && <BridgeLive onClose={() => setSelectedUploadScreen(null)} />}
             {selectedUploadScreen === 'Song' && <BridgeSongs onClose={() => setSelectedUploadScreen(null)} />}

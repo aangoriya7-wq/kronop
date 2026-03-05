@@ -62,12 +62,6 @@ export interface BunnyPhotosConfigType {
 
 export const BUNNY_CONFIG = {
   // Stream API Configuration (Video Content)
-  reels: {
-    libraryId: process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_REELS || '',
-    host: process.env.EXPO_PUBLIC_BUNNY_HOST_REELS || '',
-    apiKey: process.env.EXPO_PUBLIC_BUNNY_API_KEY_REELS || process.env.EXPO_PUBLIC_BUNNY_API_KEY || API_KEYS.BUNNY,
-    streamKey: process.env.EXPO_PUBLIC_BUNNY_STREAM_KEY_REELS || '',
-  },
   video: {
     libraryId: process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_VIDEO || '',
     host: process.env.EXPO_PUBLIC_BUNNY_HOST_VIDEO || '',
@@ -105,19 +99,15 @@ export const BUNNY_CONFIG = {
 // Security: do not hard-code any Bunny library IDs here.
 // All mappings are driven purely from environment variables.
 export const LIBRARY_ID_MAP: Record<string, string> = {
-  [process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_REELS || '']: 'Reel',
   [process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_VIDEO || '']: 'Video',
   [process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_LIVE || '']: 'Live',
-  [process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_REELS || '']: 'Story',
+  [process.env.EXPO_PUBLIC_BUNNY_LIBRARY_ID_STORY || '']: 'Story',
   photos: 'Photo',
 };
 
 // Helper function to get config by content type
 export const getBunnyConfigByType = (type: string): BunnyConfigType | BunnyPhotosConfigType => {
   switch (type.toLowerCase()) {
-    case 'reel':
-    case 'reels':
-      return BUNNY_CONFIG.reels as BunnyConfigType;
     case 'video':
     case 'videos':
       return BUNNY_CONFIG.video as BunnyConfigType;
@@ -143,7 +133,7 @@ export const getBunnyFullUrl = (type: string, videoId?: string, fileName?: strin
   
   if (!config) return '';
   
-  // For video content (reels, videos, live, story)
+  // For video content (videos, live, story)
   if ('libraryId' in config && videoId) {
     return `https://${config.host}/${videoId}/playlist.m3u8`;
   }

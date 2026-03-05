@@ -10,7 +10,7 @@ const contentSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['Reel', 'Story', 'Live', 'Video', 'Photo', 'ShayariPhoto'],
+    enum: ['Story', 'Live', 'Video', 'Photo', 'ShayariPhoto'],
     index: true
   },
   bunny_id: {
