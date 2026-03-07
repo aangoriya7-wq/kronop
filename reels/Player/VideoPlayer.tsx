@@ -35,10 +35,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       try {
         // Initialize Turbo Bridge for hardware acceleration
         if (turboBridgeRef.current && !turboBridgeRef.current.isReady()) {
-          const bridgeReady = await turboBridgeRef.current.initialize();
-          if (bridgeReady) {
-            console.log('🚀 Turbo Bridge ready for hardware acceleration');
-          }
+          await turboBridgeRef.current.initialize();
         }
 
         // Initialize NPU Controller for AI enhancement
@@ -46,11 +43,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           const npuReady = await npuControllerRef.current.initialize();
           if (npuReady) {
             setIsEnhanced(true);
-            console.log('🤖 NPU Controller ready for AI enhancement');
           }
         }
       } catch (error) {
-        console.error('❌ Failed to initialize native components:', error);
+        // Silent fail
       }
     };
 
@@ -60,25 +56,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   // Enhanced video processing with NPU
   const processVideoWithNPU = async (videoData: ArrayBuffer, width: number, height: number) => {
     if (!isEnhanced || !npuControllerRef.current) return;
-
     try {
-      const result = await npuControllerRef.current.processFrame(videoData, width, height);
-      if (result) {
-        console.log('✨ Video enhanced with AI');
-      }
+      await npuControllerRef.current.processFrame(videoData, width, height);
     } catch (error) {
-      console.error('❌ NPU processing failed:', error);
+      // Silent fail
     }
   };
 
   // Hardware-accelerated rendering
   const renderWithTurboBridge = async (frameData: ArrayBuffer) => {
     if (!turboBridgeRef.current?.isReady()) return;
-
     try {
       await turboBridgeRef.current.renderFrame(frameData, screenWidth, screenHeight);
     } catch (error) {
-      console.error('❌ Turbo Bridge rendering failed:', error);
+      // Silent fail
     }
   };
 
@@ -96,8 +87,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         player={player}
         style={styles.video}
         contentFit="cover"
-        allowsFullscreen={true}
-        allowsPictureInPicture={true}
+        allowsFullscreen={false}
+        allowsPictureInPicture={false}
+        nativeControls={false}
       />
     </View>
   );

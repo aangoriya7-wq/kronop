@@ -81,7 +81,7 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
         }
       }
     } catch (error) {
-      console.warn('Memory check failed:', error);
+      // Silent fail
     }
   }, [onMemoryWarning]);
 
@@ -91,9 +91,8 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
     
     try {
       await localVault.current.purgeOldReels();
-      console.log('🧹 Old reels purged from memory');
     } catch (error) {
-      console.error('Failed to purge old reels:', error);
+      // Silent fail
     }
   }, []);
 
@@ -106,7 +105,6 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
       if (Platform.OS !== 'web') {
         const nativeReel = await localVault.current.getFromNativeBuffer(reelId);
         if (nativeReel) {
-          console.log('⚡ Loaded reel from Native Buffer:', reelId);
           return nativeReel;
         }
       }
@@ -114,13 +112,11 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
       // Fallback to regular storage
       const reel = await localVault.current.getReel(reelId);
       if (reel) {
-        console.log('📱 Loaded reel from storage:', reelId);
         return reel;
       }
       
       return null;
     } catch (error) {
-      console.error('Failed to load reel from vault:', error);
       return null;
     }
   }, []);
@@ -133,14 +129,12 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
       // Save to Native Buffer for instant access
       if (Platform.OS !== 'web') {
         await localVault.current.saveToNativeBuffer(reel.id, reel);
-        console.log('⚡ Saved reel to Native Buffer:', reel.id);
       }
       
       // Also save to regular storage as backup
       await localVault.current.saveReel(reel);
-      console.log('💾 Saved reel to storage:', reel.id);
     } catch (error) {
-      console.error('Failed to save reel to vault:', error);
+      // Silent fail
     }
   }, [localVault]);
 
@@ -172,7 +166,6 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
         }, 1) as unknown as NodeJS.Timeout;
       }
     } catch (error) {
-      console.error('Transition failed:', error);
       setIsTransitioning(false);
     }
   }, [isTransitioning, loadReelFromVault, onReelChange]);
@@ -215,7 +208,6 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
             await saveReelToVault(firstReel);
             setActiveReel(firstReel);
             onReelChange?.(firstReel);
-            console.log('✅ Loaded initial reel from API:', firstReel.id);
             return;
           }
         }
@@ -227,7 +219,6 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
           onReelChange?.(initialReel);
         }
       } catch (error) {
-        console.error('❌ Failed to initialize feed from API:', error);
         // Fallback to local vault
         const initialReel = await loadReelFromVault('default');
         if (initialReel) {

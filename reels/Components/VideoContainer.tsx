@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, FlatList } from 'react-native';
+import { View, StyleSheet, Dimensions, FlatList, ViewToken } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
@@ -15,9 +15,11 @@ interface VideoItem {
 interface VideoContainerProps {
   videos: VideoItem[];
   renderItem: ({ item, index }: { item: VideoItem; index: number }) => React.ReactElement;
+  onViewableItemsChanged?: (info: { viewableItems: ViewToken<VideoItem>[]; changed: ViewToken<VideoItem>[] }) => void;
+  viewabilityConfig?: any;
 }
 
-const VideoContainer: React.FC<VideoContainerProps> = ({ videos, renderItem }) => {
+const VideoContainer: React.FC<VideoContainerProps> = ({ videos, renderItem, onViewableItemsChanged, viewabilityConfig }) => {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(insets.bottom + 80, 100); // Reduced to 80px minimum + safe area
   
@@ -32,6 +34,8 @@ const VideoContainer: React.FC<VideoContainerProps> = ({ videos, renderItem }) =
         snapToAlignment="start"
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
         getItemLayout={(data, index) => ({
           length: screenHeight,
           offset: screenHeight * index,
