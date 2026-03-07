@@ -1,15 +1,53 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { MessageCircle } from 'lucide-react-native';
+import { getCommentsCount, postComment } from '../ZeroLogic';
 
 interface CommentButtonProps {
-  onPress: () => void;
-  count?: number;
+  videoId: string;
+  initialCount?: number;
 }
 
-const CommentButton: React.FC<CommentButtonProps> = ({ onPress, count = 0 }) => {
+const CommentButton: React.FC<CommentButtonProps> = ({ videoId, initialCount = 0 }) => {
+  const [count, setCount] = useState(initialCount);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePress = useCallback(async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    // Show comment input dialog
+    Alert.prompt(
+      'Add Comment',
+      'Write your comment...',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Post', 
+          onPress: async (text?: string) => {
+            if (text && text.trim()) {
+              const success = await postComment(videoId, text.trim());
+              if (success) {
+                setCount(prev => prev + 1);
+              }
+            }
+            setIsLoading(false);
+          }
+        }
+      ],
+      'plain-text'
+    );
+    
+    setIsLoading(false);
+  }, [videoId, isLoading]);
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity 
+      style={[styles.container, isLoading && styles.disabled]} 
+      onPress={handlePress}
+      disabled={isLoading}
+    >
       <MessageCircle size={24} color="#FFFFFF" strokeWidth={1.5} />
       <Text style={styles.count}>{count}</Text>
     </TouchableOpacity>
@@ -20,6 +58,9 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginVertical: 8,
+  },
+  disabled: {
+    opacity: 0.6,
   },
   count: {
     color: '#FFFFFF',

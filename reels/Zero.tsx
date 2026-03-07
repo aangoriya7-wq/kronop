@@ -8,7 +8,6 @@ import {
   ViewToken,
   TouchableWithoutFeedback,
   Animated,
-  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VideoContainer from './Components/VideoContainer';
@@ -75,10 +74,7 @@ const mockVideos: VideoItem[] = [
 ];
 
 const Zero: React.FC = () => {
-  const insets = useSafeAreaInsets();
   const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [starredVideos, setStarredVideos] = useState<Set<string>>(new Set());
-  const [supportedChannels, setSupportedChannels] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0);
   const [pausedVideos, setPausedVideos] = useState<Set<string>>(new Set());
@@ -132,85 +128,6 @@ const Zero: React.FC = () => {
       setVideos(mockVideos);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStarPress = async (videoId: string) => {
-    const isCurrentlyStarred = starredVideos.has(videoId);
-    
-    // Optimistic UI update
-    setStarredVideos(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(videoId)) {
-        newSet.delete(videoId);
-      } else {
-        newSet.add(videoId);
-      }
-      return newSet;
-    });
-
-    // Update local videos state to reflect like count change
-    setVideos(prev => prev.map(video => {
-      if (video.id === videoId) {
-        return {
-          ...video,
-          likes: isCurrentlyStarred ? (video.likes || 0) - 1 : (video.likes || 0) + 1
-        };
-      }
-      return video;
-    }));
-
-    // API call to save like/unlike
-    try {
-      const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/like`, {
-        method: isCurrentlyStarred ? 'DELETE' : 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEYS.BUNNY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        // Revert UI on failure
-        setStarredVideos(prev => {
-          const newSet = new Set(prev);
-          if (isCurrentlyStarred) {
-            newSet.add(videoId);
-          } else {
-            newSet.delete(videoId);
-          }
-          return newSet;
-        });
-        setVideos(prev => prev.map(video => {
-          if (video.id === videoId) {
-            return {
-              ...video,
-              likes: isCurrentlyStarred ? (video.likes || 0) + 1 : (video.likes || 0) - 1
-            };
-          }
-          return video;
-        }));
-      }
-    } catch (error) {
-      // Revert UI on error
-      setStarredVideos(prev => {
-        const newSet = new Set(prev);
-        if (isCurrentlyStarred) {
-          newSet.add(videoId);
-        } else {
-          newSet.delete(videoId);
-        }
-        return newSet;
-      });
-      setVideos(prev => prev.map(video => {
-        if (video.id === videoId) {
-          return {
-            ...video,
-            likes: isCurrentlyStarred ? (video.likes || 0) + 1 : (video.likes || 0) - 1
-          };
-        }
-        return video;
-      }));
     }
   };
 
@@ -285,18 +202,6 @@ const Zero: React.FC = () => {
     return isVisible && !isPaused;
   }, [currentVisibleIndex, pausedVideos]);
 
-  const handleSupportPress = (channelName: string) => {
-    setSupportedChannels(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(channelName)) {
-        newSet.delete(channelName);
-      } else {
-        newSet.add(channelName);
-      }
-      return newSet;
-    });
-  };
-
   const renderVideoItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const isPlaying = isVideoPlaying(item.id, index);
     const showPlayPause = showPlayPauseMap.get(item.id) || false;
@@ -336,22 +241,23 @@ const Zero: React.FC = () => {
         {/* Gradient Overlay Bottom */}
         <View style={[styles.gradientOverlay, styles.bottomGradient]} />
         
+        {/* Interaction Bar - Self-contained buttons */}
         <InteractionBar
-          onStarPress={() => handleStarPress(item.id)}
-          onCommentPress={() => {}}
-          onSharePress={() => {}}
-          isStarred={starredVideos.has(item.id)}
-          starCount={item.likes || 0}
-          commentCount={item.comments || 0}
+          videoId={item.id}
+          title={item.title}
+          initialLikes={item.likes || 0}
+          initialComments={item.comments || 0}
+          initiallyLiked={false}
         />
+        
+        {/* Channel Info - Self-contained */}
         <ChannelInfo
+          videoId={item.id}
           channelLogo={item.channelLogo}
           channelName={item.channelName}
           videoTitle={item.title}
           isVerified={item.isVerified}
-          isSupported={supportedChannels.has(item.channelName)}
-          onChannelPress={() => {}}
-          onSupportPress={() => handleSupportPress(item.channelName)}
+          initiallySupported={false}
         />
       </View>
     );

@@ -5,34 +5,35 @@ import CommentButton from './CommentButton';
 import ShareButton from './ShareButton';
 
 interface InteractionBarProps {
-  onStarPress: () => void;
-  onCommentPress: () => void;
-  onSharePress: () => void;
-  isStarred?: boolean;
-  starCount?: number;
-  commentCount?: number;
+  videoId: string;
+  title?: string;
+  initialLikes?: number;
+  initialComments?: number;
+  initiallyLiked?: boolean;
 }
 
 const InteractionBar: React.FC<InteractionBarProps> = ({
-  onStarPress,
-  onCommentPress,
-  onSharePress,
-  isStarred = false,
-  starCount = 0,
-  commentCount = 0,
+  videoId,
+  title = '',
+  initialLikes = 0,
+  initialComments = 0,
+  initiallyLiked = false,
 }) => {
   return (
     <View style={styles.container}>
       <StarButton 
-        onPress={onStarPress} 
-        isActive={isStarred} 
-        count={starCount}
+        videoId={videoId}
+        initialCount={initialLikes}
+        initiallyLiked={initiallyLiked}
       />
       <CommentButton 
-        onPress={onCommentPress} 
-        count={commentCount}
+        videoId={videoId}
+        initialCount={initialComments}
       />
-      <ShareButton onPress={onSharePress} />
+      <ShareButton 
+        videoId={videoId}
+        title={title}
+      />
     </View>
   );
 };
@@ -41,9 +42,9 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     right: 20,
-    bottom: 80, // Moved down from 120px to 80px
+    bottom: 80,
     alignItems: 'center',
-    zIndex: 10, // Ensure buttons appear above video
+    zIndex: 10,
   },
 });
 

@@ -1,39 +1,45 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import ChannelLogo from './ChannelLogo';
 import ChannelName from './ChannelName';
 import VideoTitle from './VideoTitle';
 import SupportButton from './SupportButton';
 
 interface ChannelInfoProps {
+  videoId: string;
   channelLogo: string;
   channelName: string;
   videoTitle: string;
   isVerified?: boolean;
-  isSupported?: boolean;
-  onChannelPress: () => void;
-  onSupportPress: () => void;
+  initiallySupported?: boolean;
 }
 
 const ChannelInfo: React.FC<ChannelInfoProps> = ({
+  videoId,
   channelLogo,
   channelName,
   videoTitle,
   isVerified = false,
-  isSupported = false,
-  onChannelPress,
-  onSupportPress,
+  initiallySupported = false,
 }) => {
+  const router = useRouter();
+
+  const handleChannelPress = () => {
+    // Navigate to channel profile
+    router.push(`/channel/${channelName}` as any);
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.channelInfo} onPress={onChannelPress}>
+      <TouchableOpacity style={styles.channelInfo} onPress={handleChannelPress}>
         <ChannelLogo source={channelLogo} size={40} />
         <View style={styles.textContainer}>
           <ChannelName name={channelName} isVerified={isVerified} />
         </View>
         <SupportButton 
-          onPress={onSupportPress} 
-          isActive={isSupported}
+          channelName={channelName}
+          initiallySupported={initiallySupported}
           size="small"
         />
       </TouchableOpacity>
@@ -49,23 +55,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 80,
-    bottom: 80, // Moved down from 120px to 80px
+    bottom: 80,
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    zIndex: 10, // Ensure text appears above video
+    zIndex: 10,
   },
   channelInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4, // Reduced from 6
+    marginBottom: 4,
   },
   textContainer: {
     marginLeft: 12,
     flex: 1,
   },
   titleContainer: {
-    marginLeft: 52, // Align with channel name text
-    marginBottom: 8, // Reduced bottom margin for cleaner look
+    marginLeft: 52,
+    marginBottom: 8,
   },
 });
 
