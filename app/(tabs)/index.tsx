@@ -253,6 +253,7 @@ export default function HomeScreen() {
   const handleNotificationPress = () => router.push('/notifications' as any);
   const handleSearchPress = () => router.push('/search-user' as any);
   const handleChatPress = () => router.push('/chat' as any);
+  const handleMusicPress = () => router.push('/music' as any);
   const handleUploadPress = () => setShowUploadModal(true);
 
   const handleUploadOptionPress = (option: string) => {
@@ -377,9 +378,10 @@ export default function HomeScreen() {
       <View style={[styles.header, { paddingTop: 40 }]}>
         <Text style={styles.appTitle}>Kronop</Text>
         <View style={styles.headerActions}>
-          <HeaderButton icon="notifications" onPress={handleNotificationPress} testID="notification-btn" />
-          <HeaderButton icon="person-search" onPress={handleSearchPress} testID="search-btn" />
-          <HeaderButton icon="chat-bubble" onPress={handleChatPress} testID="chat-btn" />
+          <HeaderButton icon="bell-outline" onPress={handleNotificationPress} testID="notification-btn" />
+          <HeaderButton icon="account-search-outline" onPress={handleSearchPress} testID="search-btn" />
+          <HeaderButton icon="chat-outline" onPress={handleChatPress} testID="chat-btn" />
+          <HeaderButton icon="music-note-outline" onPress={handleMusicPress} testID="music-btn" />
         </View>
       </View>
 
@@ -482,7 +484,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Story')}
               >
-                <Ionicons name="book" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"menu_book_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Story</Text>
               </TouchableOpacity>
               
@@ -490,7 +492,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Photo')}
               >
-                <Ionicons name="image" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"image_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Photo</Text>
               </TouchableOpacity>
               
@@ -498,7 +500,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Reels')}
               >
-                <Ionicons name="film" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"movie_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Reels</Text>
               </TouchableOpacity>
               
@@ -506,7 +508,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Video')}
               >
-                <Ionicons name="videocam" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"videocam_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Video</Text>
               </TouchableOpacity>
               
@@ -514,7 +516,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Live')}
               >
-                <Ionicons name="radio" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"radio_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Live</Text>
               </TouchableOpacity>
               
@@ -522,7 +524,7 @@ export default function HomeScreen() {
                 style={styles.uploadOption}
                 onPress={() => handleUploadOptionPress('Song')}
               >
-                <Ionicons name="musical-notes" size={24} color="#6A5ACD" />
+                <MaterialIcons name={"music_note_outlined" as any} size={16} color="#6A5ACD" />
                 <Text style={styles.uploadOptionText}>Song</Text>
               </TouchableOpacity>
             </View>
@@ -592,7 +594,7 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2, // Reduced from theme.spacing.xs (4px) to 2px for tighter spacing
+    gap: theme.spacing.sm, // Increased from 2px to provide more spacing between buttons
   },
   // Photo Categories - HORIZONTAL SCROLL, TEXT ONLY
   photoCategoriesContainer: {
@@ -705,7 +707,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 15,
+    gap: 25, // Increased from 15 to provide more spacing between options
   },
   uploadOption: {
     width: '30%',
