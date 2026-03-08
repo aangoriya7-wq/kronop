@@ -26,116 +26,7 @@ import BridgePhoto from '../../components/uploadBridge/bridge-photo';
 import BridgeReels from '../../components/uploadBridge/bridge-reels';
 import BridgeVideo from '../../components/uploadBridge/bridge-video';
 import BridgeLive from '../../components/uploadBridge/bridge-live';
-import BridgeSongs from '../../components/uploadBridge/bridge-songs';
-
-// Mock songs data for music player - Hindi New Songs (15 Songs)
-const mockSongs = [
-  {
-    id: '1',
-    title: 'Kesariya',
-    artist: 'Arijit Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=1',
-    isPlaying: false
-  },
-  {
-    id: '2',
-    title: 'Tum Kya Mile',
-    artist: 'Arijit Singh, Shashwat Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=2',
-    isPlaying: true
-  },
-  {
-    id: '3',
-    title: 'Jhoome Jo Pathaan',
-    artist: 'Arijit Singh, Sukriti Kakar',
-    channelPhoto: 'https://picsum.photos/60/60?random=3',
-    isPlaying: false
-  },
-  {
-    id: '4',
-    title: 'O Bedardeya',
-    artist: 'Arijit Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=4',
-    isPlaying: false
-  },
-  {
-    id: '5',
-    title: 'Phir Aur Kya Chahiye',
-    artist: 'Arijit Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=5',
-    isPlaying: false
-  },
-  {
-    id: '6',
-    title: 'Apna Bana Le',
-    artist: 'Arijit Singh, Sachin-Jigar',
-    channelPhoto: 'https://picsum.photos/60/60?random=6',
-    isPlaying: false
-  },
-  {
-    id: '7',
-    title: 'Raataan Lambiyan',
-    artist: 'Jubin Nautiyal, Asees Kaur',
-    channelPhoto: 'https://picsum.photos/60/60?random=7',
-    isPlaying: false
-  },
-  {
-    id: '8',
-    title: 'Srivaalli',
-    artist: 'Sid Sriram',
-    channelPhoto: 'https://picsum.photos/60/60?random=8',
-    isPlaying: false
-  },
-  {
-    id: '9',
-    title: 'Mere Yaaraa',
-    artist: 'Arijit Singh, Neeti Mohan',
-    channelPhoto: 'https://picsum.photos/60/60?random=9',
-    isPlaying: false
-  },
-  {
-    id: '10',
-    title: 'Tere Pyaar Mein',
-    artist: 'Arijit Singh, Nikhita Gandhi',
-    channelPhoto: 'https://picsum.photos/60/60?random=10',
-    isPlaying: false
-  },
-  {
-    id: '11',
-    title: 'Deva Deva',
-    artist: 'Arijit Singh, Shashaa Tirupati',
-    channelPhoto: 'https://picsum.photos/60/60?random=11',
-    isPlaying: false
-  },
-  {
-    id: '12',
-    title: 'Rasiya',
-    artist: 'Pritam, Shreya Ghoshal',
-    channelPhoto: 'https://picsum.photos/60/60?random=12',
-    isPlaying: false
-  },
-  {
-    id: '13',
-    title: 'Show Me The Thumka',
-    artist: 'Sunidhi Chauhan, Shashwat Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=13',
-    isPlaying: false
-  },
-  {
-    id: '14',
-    title: 'What Jhumka?',
-    artist: 'Arijit Singh, Jonita Gandhi',
-    channelPhoto: 'https://picsum.photos/60/60?random=14',
-    isPlaying: false
-  },
-  {
-    id: '15',
-    title: 'Dhokha',
-    artist: 'Arijit Singh',
-    channelPhoto: 'https://picsum.photos/60/60?random=15',
-    isPlaying: false
-  }
-];
+import BridgeSongs from '../../components/uploadBridge/bridge-music';
 
 // Photo categories - TEXT ONLY, HORIZONTAL SCROLL WITH PROPER FILTERING
 const PHOTO_CATEGORIES = [
@@ -175,12 +66,6 @@ export default function HomeScreen() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedUploadScreen, setSelectedUploadScreen] = useState<string | null>(null);
   
-  // Music player states
-  const [currentSongId, setCurrentSongId] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showMusicModal, setShowMusicModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredSongs, setFilteredSongs] = useState(mockSongs);
 
   // Stories state - Grouped by user
   const [groupedStories, setGroupedStories] = useState<GroupedStory[]>([]);
@@ -368,7 +253,6 @@ export default function HomeScreen() {
   const handleNotificationPress = () => router.push('/(tabs)/notifications' as any);
   const handleSearchPress = () => router.push('/search-user' as any);
   const handleChatPress = () => router.push('/chat' as any);
-  const handleMusicPress = () => setShowMusicModal(true);
   const handleUploadPress = () => setShowUploadModal(true);
 
   const handleUploadOptionPress = (option: string) => {
@@ -466,16 +350,6 @@ export default function HomeScreen() {
     setPhotosPage(prev => prev + 1);
   };
 
-  // Memoized music controls
-  const handlePlayPause = useCallback((songId: string) => {
-    if (currentSongId === songId) {
-      setIsPlaying(!isPlaying);
-    } else {
-      setCurrentSongId(songId);
-      setIsPlaying(true);
-    }
-  }, [currentSongId, isPlaying]);
-
   // Memoized photo item renderer
   const PhotoItem = memo(({ item }: { item: any }) => (
     <TouchableOpacity style={styles.photoItem} activeOpacity={0.8}>
@@ -497,64 +371,6 @@ export default function HomeScreen() {
     </TouchableOpacity>
   ));
 
-  // Memoized search functionality
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    if (query.trim() === '') {
-      setFilteredSongs(mockSongs);
-    } else {
-      const filtered = mockSongs.filter(song => 
-        song.title.toLowerCase().includes(query.toLowerCase()) ||
-        song.artist.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredSongs(filtered);
-    }
-  }, []);
-
-  // Memoized song item renderer
-  const SongItem = memo(({ item }: { item: any }) => (
-    <View style={styles.songCard}>
-      {/* Channel Photo - Left Side */}
-      <Image 
-        source={{ uri: item.channelPhoto }} 
-        style={styles.channelPhoto}
-        contentFit="cover"
-      />
-      
-      {/* Song Info - Middle */}
-      <View style={styles.songInfo}>
-        <Text style={styles.songTitle}>{item.title}</Text>
-        <Text style={styles.artistName}>{item.artist}</Text>
-      </View>
-      
-      {/* Music Controls - Right Side */}
-      <View style={styles.musicControls}>
-        <TouchableOpacity 
-          style={[styles.playButton, currentSongId === item.id && isPlaying && styles.playButtonActive]}
-          onPress={() => handlePlayPause(item.id)}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons 
-            name={currentSongId === item.id && isPlaying ? "pause" : "play-arrow"} 
-            size={28} 
-            color={currentSongId === item.id && isPlaying ? "#fff" : "#000"} 
-          />
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.controlButton}
-          onPress={() => {
-            // Share functionality
-            Alert.alert('Share', `Sharing ${item.title} by ${item.artist}`);
-          }}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="share" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  ));
-
   return (
     <View style={styles.container}>
       <StatusBarOverlay style="light" backgroundColor="#000000" />
@@ -564,7 +380,6 @@ export default function HomeScreen() {
           <HeaderButton icon="notifications" onPress={handleNotificationPress} testID="notification-btn" />
           <HeaderButton icon="person-search" onPress={handleSearchPress} testID="search-btn" />
           <HeaderButton icon="chat-bubble" onPress={handleChatPress} testID="chat-btn" />
-          <HeaderButton icon="music-note" onPress={handleMusicPress} testID="music-btn" />
         </View>
       </View>
 
@@ -715,52 +530,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Music Player Modal - Full Screen */}
-      <Modal
-        visible={showMusicModal}
-        animationType="none"
-        onRequestClose={() => setShowMusicModal(false)}
-      >
-        <View style={styles.fullScreenMusicContainer}>
-          {/* Header with Search and Close Button */}
-          <View style={styles.musicModalHeader}>
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={() => setShowMusicModal(false)}
-              activeOpacity={0.7}
-            >
-              <MaterialIcons name="close" size={28} color="#fff" />
-            </TouchableOpacity>
-            
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-              <MaterialIcons name="search" size={20} color="#888" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search songs..."
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={handleSearch}
-                clearButtonMode="never" // Removes X button on iOS
-                contextMenuHidden={true} // Disables context menu on Android/iOS
-                selectTextOnFocus={false} // Prevents text selection on focus
-              />
-            </View>
-            
-            <View style={styles.placeholder} />
-          </View>
-          
-          {/* Music Player Cards */}
-          <FlatList
-            data={filteredSongs}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <SongItem item={item} />}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.musicListContainer}
-            style={{ flex: 1 }}
-          />
-        </View>
-      </Modal>
 
       {/* Upload Screens Modal */}
       <Modal
@@ -949,103 +718,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  // Music Section Styles - Professional Music Player
-  musicSectionContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  musicListContainer: {
-    paddingVertical: theme.spacing.sm,
-  },
-  songCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    marginHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  channelPhoto: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  songInfo: {
-    flex: 1,
-    marginLeft: theme.spacing.md,
-  },
-  songTitle: {
-    fontSize: theme.typography.fontSize.md,
-    fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.colors.text.primary,
-    marginBottom: 2,
-  },
-  artistName: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.text.secondary,
-  },
-  musicControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  controlButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  playButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(139, 0, 255, 0.3)',
-  },
-  playButtonActive: {
-    backgroundColor: '#8B00FF',
-    borderColor: '#8B00FF',
-  },
-  // Full Screen Music Modal Styles
-  fullScreenMusicContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  musicModalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: 0,
-    paddingTop: 20, // Minimum space - just for status bar
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  musicModalTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.colors.text.primary,
-  },
   placeholder: {
     width: 40,
   },
@@ -1104,28 +776,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontSize: theme.typography.fontSize.xs,
   },
-  // Search Bar Styles
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 25,
-    paddingHorizontal: theme.spacing.lg,
-    marginHorizontal: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-    height: 45,
-  },
-  searchIcon: {
-    marginRight: theme.spacing.md,
-  },
-  searchInput: {
-    flex: 1,
-    color: '#fff',
-    fontSize: theme.typography.fontSize.md,
-    paddingVertical: 0,
-  },
   // Upload Modal Styles
   fullScreenUploadContainer: {
     flex: 1,
@@ -1140,6 +790,14 @@ const styles = StyleSheet.create({
     paddingTop: 20, // Minimum space - just for status bar
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   uploadModalTitle: {
     fontSize: theme.typography.fontSize.lg,
