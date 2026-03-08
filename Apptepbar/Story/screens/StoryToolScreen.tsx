@@ -105,14 +105,10 @@ export default function StoryToolScreen() {
 
 
   const loadStories = async () => {
-
     try {
-
       setLoading(true);
-
-      const response = await storiesApi.getStories();
-
-      const data = Array.isArray(response) ? response : response.data || [];
+      const response: any = await storiesApi.getStories();
+      const data = Array.isArray(response) ? response : response?.data || [];
 
       
 
@@ -233,48 +229,26 @@ export default function StoryToolScreen() {
 
 
   if (loading && !refreshing) {
-
     return (
-
       <SafeScreen>
-
         <View style={styles.loadingContainer}>
-
           <ActivityIndicator size="large" color="#8B00FF" />
-
           <Text style={styles.loadingText}>Loading stories...</Text>
-
         </View>
-
       </SafeScreen>
-
     );
-
   }
 
-
-
   return (
-
     <SafeScreen>
-
       <View style={styles.container}>
-
         <View style={styles.header}>
-
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-
             <MaterialIcons name="arrow-back" size={24} color="#fff" />
-
           </TouchableOpacity>
-
           <Text style={styles.headerTitle}>{title}</Text>
-
           <View style={styles.placeholder} />
-
         </View>
-
-
 
         <View style={styles.summaryCard}>
 

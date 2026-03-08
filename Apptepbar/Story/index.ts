@@ -6,7 +6,3 @@ export { StoryItem } from './components/StoryItem';
 
 // Screens
 export { default as StoryToolScreen } from './screens/StoryToolScreen';
-
-// Models
-export { default as StoryModel } from './models/StoryModel';
-export { default as StorySchema } from './models/StorySchema';
