@@ -250,7 +250,7 @@ export default function HomeScreen() {
   };
 
   // Compressed header button handlers
-  const handleNotificationPress = () => router.push('/(tabs)/notifications' as any);
+  const handleNotificationPress = () => router.push('/notifications' as any);
   const handleSearchPress = () => router.push('/search-user' as any);
   const handleChatPress = () => router.push('/chat' as any);
   const handleUploadPress = () => setShowUploadModal(true);

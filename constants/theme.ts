@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { AppColors } from '../appColor/AppColors';
+import AppColors from '../appColor/AppColors';
 
 export const theme = {
   colors: AppColors,

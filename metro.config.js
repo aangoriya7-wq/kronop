@@ -13,6 +13,11 @@ config.resolver.alias = {
   stream: 'react-native-stream',
   buffer: '@craftzdog/react-native-buffer',
   randombytes: 'react-native-randombytes',
+  '@': require('path').resolve(__dirname),
+  '@/components': require('path').resolve(__dirname, 'components'),
+  '@/app': require('path').resolve(__dirname, 'app'),
+  '@/context': require('path').resolve(__dirname, 'context'),
+  '@/constants': require('path').resolve(__dirname, 'constants'),
 };
 
 module.exports = config;
