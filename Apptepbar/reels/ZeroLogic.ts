@@ -1,4 +1,5 @@
 import { API_KEYS } from '@/constants/Config';
+import { getVideoUrl } from './CloudConfig';
 
 const KRONOP_API_URL = 'https://kronop-9gju.onrender.com';
 
@@ -88,22 +89,23 @@ export const toggleSupport = async (channelName: string, isCurrentlySupported: b
 };
 
 // Share reel
-export const shareReel = async (videoId: string, title: string): Promise<boolean> => {
+export const shareReel = async (videoId: string, title: string, videoUrl: string): Promise<boolean> => {
   try {
     const shareUrl = `kronop://reels/${videoId}`;
     const webUrl = `https://kronop.app/reels/${videoId}`;
+    const r2StreamingUrl = getVideoUrl(videoUrl);
     
     // Try native share first
     if (navigator.share) {
       await navigator.share({
         title: title,
-        url: webUrl,
+        url: r2StreamingUrl,
       });
       return true;
     }
     
     // Fallback: copy to clipboard
-    await navigator.clipboard.writeText(webUrl);
+    await navigator.clipboard.writeText(r2StreamingUrl);
     return true;
   } catch (error) {
     return false;
@@ -143,5 +145,23 @@ export const checkUserSupports = async (channelName: string): Promise<boolean> =
     return false;
   } catch (error) {
     return false;
+  }
+};
+
+// Get viewer count
+export const getViewerCount = async (videoId: string): Promise<number> => {
+  try {
+    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/viewers`, {
+      headers: {
+        'Authorization': `Bearer ${API_KEYS.BUNNY}`,
+      }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.count || 0;
+    }
+    return 0;
+  } catch (error) {
+    return 0;
   }
 };

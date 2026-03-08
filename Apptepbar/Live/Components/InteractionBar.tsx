@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import StarButton from './StarButton';
-import CommentButton from './CommentButton';
 import ShareButton from './ShareButton';
 
 interface InteractionBarProps {
@@ -25,10 +24,6 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
         videoId={videoId}
         initialCount={initialLikes}
         initiallyLiked={initiallyLiked}
-      />
-      <CommentButton 
-        videoId={videoId}
-        initialCount={initialComments}
       />
       <ShareButton 
         videoId={videoId}

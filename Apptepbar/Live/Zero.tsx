@@ -8,6 +8,8 @@ import {
   ViewToken,
   TouchableWithoutFeedback,
   Animated,
+  TextInput,
+  Text as RNText,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VideoContainer from './Components/VideoContainer';
@@ -80,6 +82,7 @@ const Zero: React.FC = () => {
   const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0);
   const [pausedVideos, setPausedVideos] = useState<Set<string>>(new Set());
   const [showPlayPauseMap, setShowPlayPauseMap] = useState<Map<string, boolean>>(new Map());
+  const [liveDots, setLiveDots] = useState(1);
   const fadeAnimMap = useRef<Map<string, Animated.Value>>(new Map()).current;
   const hideTimeoutMap = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map()).current;
 
@@ -89,7 +92,7 @@ const Zero: React.FC = () => {
   useEffect(() => {
     const initializeReels = async () => {
       try {
-        await initializeTurboBridge();
+        // await initializeTurboBridge(); // Disabled to prevent crashes
         await fetchVideosFromAPI();
       } catch (error) {
         setLoading(false);
@@ -97,6 +100,14 @@ const Zero: React.FC = () => {
     };
     
     initializeReels();
+  }, []);
+
+  // Animate LIVE dots
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveDots(prev => prev === 5 ? 1 : prev + 1);
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   // Fetch videos from Kronop API
@@ -215,6 +226,12 @@ const Zero: React.FC = () => {
       <View style={styles.videoContainer}>
         {/* Status Bar Overlay */}
         <View style={[styles.statusBarOverlay, { height: insets.top }]} />
+        
+        {/* LIVE Indicator */}
+        <View style={[styles.liveIndicatorContainer, { top: insets.top + 10 }]}>
+          <RNText style={styles.liveText}>{`LIVE${".".repeat(liveDots)}`}</RNText>
+        </View>
+        
         <TouchableWithoutFeedback onPress={() => handleVideoTap(item.id)}>
           <View style={styles.videoWrapper}>
             <VideoPlayer
@@ -269,6 +286,15 @@ const Zero: React.FC = () => {
           isVerified={item.isVerified}
           initiallySupported={false}
         />
+
+        {/* Comment Input */}
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            placeholder="Add a comment..."
+            placeholderTextColor="#999"
+            style={styles.commentInput}
+          />
+        </View>
       </View>
     );
   };
@@ -397,6 +423,31 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     zIndex: 10,
+  },
+  liveIndicatorContainer: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 10,
+  },
+  liveText: {
+    color: '#FF0000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  commentInputContainer: {
+    position: 'absolute',
+    bottom: 70,
+    left: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  commentInput: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    color: '#fff',
+    fontSize: 14,
   },
 });
 

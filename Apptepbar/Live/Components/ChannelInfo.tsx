@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import ChannelLogo from './ChannelLogo';
 import ChannelName from './ChannelName';
-import VideoTitle from './VideoTitle';
+// import VideoTitle from './VideoTitle';
 import SupportButton from './SupportButton';
 
 interface ChannelInfoProps {
@@ -43,9 +43,9 @@ const ChannelInfo: React.FC<ChannelInfoProps> = ({
           size="small"
         />
       </TouchableOpacity>
-      <View style={styles.titleContainer}>
+      {/* <View style={styles.titleContainer}>
         <VideoTitle title={videoTitle} />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 80,
-    bottom: 80,
+    bottom: 100,
     flexDirection: 'column',
     justifyContent: 'flex-end',
     zIndex: 10,

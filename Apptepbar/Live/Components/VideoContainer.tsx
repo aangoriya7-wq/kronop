@@ -41,6 +41,10 @@ const VideoContainer: React.FC<VideoContainerProps> = ({ videos, renderItem, onV
           offset: screenHeight * index,
           index,
         })}
+        initialNumToRender={1}
+        maxToRenderPerBatch={1}
+        windowSize={1}
+        removeClippedSubviews={true}
         contentContainerStyle={{ paddingBottom: bottomPadding }}
       />
     </View>

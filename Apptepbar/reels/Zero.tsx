@@ -88,7 +88,7 @@ const Zero: React.FC = () => {
   useEffect(() => {
     const initializeReels = async () => {
       try {
-        await initializeTurboBridge();
+        // await initializeTurboBridge(); // Disabled to prevent crashes
         await fetchVideosFromAPI();
       } catch (error) {
         setLoading(false);
