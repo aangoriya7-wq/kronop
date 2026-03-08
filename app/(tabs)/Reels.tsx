@@ -1,5 +1,5 @@
 import React from 'react';
-import Zero from '../../reels/Zero';
+import Zero from '../../Apptepbar/reels/Zero';
 
 const Reels: React.FC = () => {
   return <Zero />;

@@ -1,11 +1,12 @@
-import { API_KEYS } from '../constants/Config';
+import { API_KEYS } from '@/constants/Config';
+import { getVideoUrl } from './CloudConfig';
 
 const KRONOP_API_URL = 'https://kronop-9gju.onrender.com';
 
 // Like/Unlike API
 export const toggleLike = async (videoId: string, isCurrentlyLiked: boolean): Promise<boolean> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/like`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/like`, {
       method: isCurrentlyLiked ? 'DELETE' : 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
@@ -21,7 +22,7 @@ export const toggleLike = async (videoId: string, isCurrentlyLiked: boolean): Pr
 // Get likes count
 export const getLikesCount = async (videoId: string): Promise<number> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/likes`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/likes`, {
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
       }
@@ -39,7 +40,7 @@ export const getLikesCount = async (videoId: string): Promise<number> => {
 // Get comments count
 export const getCommentsCount = async (videoId: string): Promise<number> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/comments`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/comments`, {
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
       }
@@ -57,7 +58,7 @@ export const getCommentsCount = async (videoId: string): Promise<number> => {
 // Post comment
 export const postComment = async (videoId: string, text: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/comments`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/comments`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
@@ -88,22 +89,23 @@ export const toggleSupport = async (channelName: string, isCurrentlySupported: b
 };
 
 // Share reel
-export const shareReel = async (videoId: string, title: string): Promise<boolean> => {
+export const shareReel = async (videoId: string, title: string, videoUrl: string): Promise<boolean> => {
   try {
-    const shareUrl = `kronop://reels/${videoId}`;
-    const webUrl = `https://kronop.app/reels/${videoId}`;
+    const shareUrl = `kronop://live/${videoId}`;
+    const webUrl = `https://kronop.app/live/${videoId}`;
+    const r2StreamingUrl = getVideoUrl(videoUrl);
     
     // Try native share first
     if (navigator.share) {
       await navigator.share({
         title: title,
-        url: webUrl,
+        url: r2StreamingUrl,
       });
       return true;
     }
     
     // Fallback: copy to clipboard
-    await navigator.clipboard.writeText(webUrl);
+    await navigator.clipboard.writeText(r2StreamingUrl);
     return true;
   } catch (error) {
     return false;
@@ -113,7 +115,7 @@ export const shareReel = async (videoId: string, title: string): Promise<boolean
 // Check if user liked video
 export const checkUserLiked = async (videoId: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/reels/${videoId}/like/status`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/like/status`, {
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
       }
@@ -128,20 +130,20 @@ export const checkUserLiked = async (videoId: string): Promise<boolean> => {
   }
 };
 
-// Check if user supports channel
-export const checkUserSupports = async (channelName: string): Promise<boolean> => {
+// Get viewer count
+export const getViewerCount = async (videoId: string): Promise<number> => {
   try {
-    const response = await fetch(`${KRONOP_API_URL}/api/channels/${channelName}/support/status`, {
+    const response = await fetch(`${KRONOP_API_URL}/api/live/${videoId}/viewers`, {
       headers: {
         'Authorization': `Bearer ${API_KEYS.BUNNY}`,
       }
     });
     if (response.ok) {
       const data = await response.json();
-      return data.supported || false;
+      return data.count || 0;
     }
-    return false;
+    return 0;
   } catch (error) {
-    return false;
+    return 0;
   }
 };

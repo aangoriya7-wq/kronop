@@ -16,7 +16,8 @@ import ChannelInfo from './Components/ChannelInfo';
 import VideoPlayer from './Player/VideoPlayer';
 // @ts-ignore
 import GhostFeedManager from './GhostFeedManager';
-import { API_KEYS } from '../constants/Config';
+import ViewerCount from './Components/ViewerCount';
+import { API_KEYS } from '@/constants/Config';
 import { initializeTurboBridge } from './Native/TurboBridge';
 
 // API URL for Reels
@@ -82,6 +83,8 @@ const Zero: React.FC = () => {
   const fadeAnimMap = useRef<Map<string, Animated.Value>>(new Map()).current;
   const hideTimeoutMap = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map()).current;
 
+  const insets = useSafeAreaInsets();
+
   // Initialize Turbo Bridge and fetch videos
   useEffect(() => {
     const initializeReels = async () => {
@@ -99,7 +102,7 @@ const Zero: React.FC = () => {
   // Fetch videos from Kronop API
   const fetchVideosFromAPI = async () => {
     try {
-      const response = await fetch(`${KRONOP_API_URL}/api/reels`, {
+      const response = await fetch(`${KRONOP_API_URL}/api/live`, {
         headers: {
           'Authorization': `Bearer ${API_KEYS.BUNNY}`,
           'Content-Type': 'application/json'
@@ -210,6 +213,8 @@ const Zero: React.FC = () => {
 
     return (
       <View style={styles.videoContainer}>
+        {/* Status Bar Overlay */}
+        <View style={[styles.statusBarOverlay, { height: insets.top }]} />
         <TouchableWithoutFeedback onPress={() => handleVideoTap(item.id)}>
           <View style={styles.videoWrapper}>
             <VideoPlayer
@@ -238,6 +243,11 @@ const Zero: React.FC = () => {
         </TouchableWithoutFeedback>
         {/* Gradient Overlay Top */}
         <View style={[styles.gradientOverlay, styles.topGradient]} />
+        
+        {/* Viewer Count */}
+        <View style={styles.viewerCountContainer}>
+          <ViewerCount videoId={item.id} />
+        </View>
         {/* Gradient Overlay Bottom */}
         <View style={[styles.gradientOverlay, styles.bottomGradient]} />
         
@@ -373,6 +383,20 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: 'transparent',
     borderBottomColor: 'transparent',
+  },
+  viewerCountContainer: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 10,
+  },
+  statusBarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    zIndex: 10,
   },
 });
 

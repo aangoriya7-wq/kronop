@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Platform } from 'react-native';
 import LocalVault from './Storage/LocalVault';
-import { API_KEYS } from '../constants/Config';
+import { API_KEYS } from '@/constants/Config';
 
 const KRONOP_API_URL = 'https://kronop-9gju.onrender.com';
 
@@ -85,7 +85,7 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
     }
   }, [onMemoryWarning]);
 
-  // Purge old reels to free memory
+  // Purge old live to free memory
   const purgeOldReels = useCallback(async () => {
     if (!localVault.current) return;
     
@@ -182,7 +182,7 @@ const GhostFeedManager: React.FC<GhostFeedManagerProps> = ({
     const initializeFeed = async () => {
       try {
         // Try to fetch from API first
-        const response = await fetch(`${KRONOP_API_URL}/api/reels`, {
+        const response = await fetch(`${KRONOP_API_URL}/api/live`, {
           headers: {
             'Authorization': `Bearer ${API_KEYS.BUNNY}`,
             'Content-Type': 'application/json'
