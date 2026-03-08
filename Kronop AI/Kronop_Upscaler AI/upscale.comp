@@ -1,0 +1,177 @@
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+layout(binding = 0) readonly buffer InputBuffer {
+    vec4 inputPixels[];
+};
+
+layout(binding = 1) writeonly buffer OutputBuffer {
+    vec4 outputPixels[];
+};
+
+layout(binding = 2) readonly buffer NeuralWeights {
+    float weights[];
+};
+
+layout(binding = 3) readonly buffer NeuralBiases {
+    float biases[];
+};
+
+layout(push_constant) uniform PushConstants {
+    int inputWidth;
+    int inputHeight;
+    int outputWidth;
+    int outputHeight;
+    int scale_factor;
+    int neural_offset;
+} pc;
+
+// Mitchell-Netravali bicubic parameters
+const float B = 1.0/3.0;
+const float C = 1.0/3.0;
+
+float bicubicWeight(float x) {
+    float absX = abs(x);
+    float absX2 = absX * absX;
+    float absX3 = absX2 * absX;
+    
+    if (absX <= 1.0) {
+        return (12.0 - 9.0 * B - 6.0 * C) * absX3 +
+               (-18.0 + 12.0 * B + 6.0 * C) * absX2 +
+               (6.0 - 2.0 * B);
+    } else if (absX <= 2.0) {
+        return (-B - 6.0 * C) * absX3 +
+               (6.0 * B + 30.0 * C) * absX2 +
+               (-12.0 * B - 48.0 * C) * absX +
+               (8.0 * B + 24.0 * C);
+    }
+    return 0.0;
+}
+
+vec4 bicubicInterpolation(vec2 coord) {
+    float srcX = coord.x / float(pc.scale_factor);
+    float srcY = coord.y / float(pc.scale_factor);
+    
+    int x0 = int(floor(srcX));
+    int y0 = int(floor(srcY));
+    
+    float dx = srcX - float(x0);
+    float dy = srcY - float(y0);
+    
+    vec4 result = vec4(0.0);
+    
+    for (int j = -1; j <= 2; ++j) {
+        for (int i = -1; i <= 2; ++i) {
+            int xi = clamp(x0 + i, 0, pc.inputWidth - 1);
+            int yi = clamp(y0 + j, 0, pc.inputHeight - 1);
+            
+            float weight = bicubicWeight(float(i) - dx) * bicubicWeight(float(j) - dy);
+            result += inputPixels[yi * pc.inputWidth + xi] * weight;
+        }
+    }
+    
+    return result;
+}
+
+float relu(float x) {
+    return max(0.0, x);
+}
+
+vec4 neuralEnhancement(vec4 pixel, ivec2 coord) {
+    // Extract 4x4 patch around pixel
+    float pixelPatch[16];
+    int patchIdx = 0;
+    
+    for (int j = -1; j <= 2; ++j) {
+        for (int i = -1; i <= 2; ++i) {
+            int xi = clamp(coord.x + i, 0, pc.outputWidth - 1);
+            int yi = clamp(coord.y + j, 0, pc.outputHeight - 1);
+            pixelPatch[patchIdx++] = inputPixels[yi * pc.inputWidth + xi].r;
+        }
+    }
+    
+    // Neural Network Forward Pass
+    // Layer 1: 16 -> 32
+    float hidden1[32];
+    for (int i = 0; i < 32; ++i) {
+        float sum = biases[i];
+        for (int j = 0; j < 16; ++j) {
+            sum += pixelPatch[j] * weights[j * 32 + i];
+        }
+        hidden1[i] = relu(sum);
+    }
+    
+    // Layer 2: 32 -> 16
+    float hidden2[16];
+    for (int i = 0; i < 16; ++i) {
+        float sum = biases[32 + i];
+        for (int j = 0; j < 32; ++j) {
+            sum += hidden1[j] * weights[512 + j * 16 + i];
+        }
+        hidden2[i] = relu(sum);
+    }
+    
+    // Output Layer: 16 -> 4
+    vec4 enhanced;
+    for (int i = 0; i < 4; ++i) {
+        float sum = biases[48 + i];
+        for (int j = 0; j < 16; ++j) {
+            sum += hidden2[j] * weights[768 + j * 4 + i];
+        }
+        enhanced[i] = relu(sum);
+    }
+    
+    // Blend original and enhanced
+    return mix(pixel, enhanced, 0.3);
+}
+
+vec4 antiAliasingFilter(vec4 pixel, ivec2 coord) {
+    vec4 sum = vec4(0.0);
+    float weights[9] = {
+        1.0, 2.0, 1.0,
+        2.0, 4.0, 2.0,
+        1.0, 2.0, 1.0
+    };
+    
+    int weightIdx = 0;
+    for (int j = -1; j <= 1; ++j) {
+        for (int i = -1; i <= 1; ++i) {
+            int xi = clamp(coord.x + i, 0, pc.outputWidth - 1);
+            int yi = clamp(coord.y + j, 0, pc.outputHeight - 1);
+            sum += pixel * weights[weightIdx++];
+        }
+    }
+    return sum / 16.0; // Normalize by sum of weights
+}
+
+void main() {
+    ivec2 workGroup = ivec2(gl_WorkGroupID);
+    ivec2 localThread = ivec2(gl_LocalInvocationID);
+    ivec2 globalCoord = workGroup * ivec2(16) + localThread;
+    
+    if (globalCoord.x >= pc.outputWidth || globalCoord.y >= pc.outputHeight) {
+        return;
+    }
+    
+    int outputIdx = globalCoord.y * pc.outputWidth + globalCoord.x;
+    
+    // Step 1: Bicubic Interpolation
+    vec4 bicubicResult = bicubicInterpolation(vec2(globalCoord));
+    
+    // Step 2: Neural Network Enhancement
+    vec4 enhancedResult = neuralEnhancement(bicubicResult, globalCoord);
+    
+    // Step 3: Anti-aliasing (if not on border)
+    vec4 finalResult;
+    if (globalCoord.x > 0 && globalCoord.x < pc.outputWidth - 1 &&
+        globalCoord.y > 0 && globalCoord.y < pc.outputHeight - 1) {
+        finalResult = antiAliasingFilter(enhancedResult, globalCoord);
+    } else {
+        finalResult = enhancedResult;
+    }
+    
+    // Step 4: Gamma correction and output
+    finalResult = pow(finalResult, vec4(1.0/2.2));
+    outputPixels[outputIdx] = clamp(finalResult, 0.0, 1.0);
+}

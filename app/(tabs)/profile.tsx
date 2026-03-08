@@ -9,11 +9,13 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
+  Modal
 } from 'react-native';
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 
 const mockUserData = {
   displayName: 'John Doe',
@@ -40,6 +42,8 @@ export default function ProfileScreen() {
     bio: '',
     coverPhoto: ''
   });
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedUploadScreen, setSelectedUploadScreen] = useState<string | null>(null);
 
   const tabs = [
     { id: 'video', label: 'Video' },
@@ -47,7 +51,7 @@ export default function ProfileScreen() {
     { id: 'photo', label: 'Photo' },
     { id: 'live', label: 'Live' },
     { id: 'songs', label: 'Songs' },
-    { id: 'save', label: 'Save' }
+
   ];
 
   useEffect(() => {
@@ -134,6 +138,53 @@ export default function ProfileScreen() {
     router.push('/menu' as any);
   };
 
+  const handleUploadPress = () => setShowUploadModal(true);
+
+  const handleUploadOptionPress = (option: string) => {
+    setShowUploadModal(false);
+    setSelectedUploadScreen(option);
+  };
+
+  // Image picker handlers for cover photo and profile picture
+  const pickCoverPhoto = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Please allow access to your photo library');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setUserData(prev => ({ ...prev, coverPhoto: result.assets[0].uri }));
+      setEditData(prev => ({ ...prev, coverPhoto: result.assets[0].uri }));
+    }
+  };
+
+  const pickProfilePicture = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Please allow access to your photo library');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setUserData(prev => ({ ...prev, avatar: result.assets[0].uri }));
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'video':
@@ -206,20 +257,28 @@ export default function ProfileScreen() {
           <TouchableOpacity style={styles.iconButton} onPress={handleSettingsPress}>
             <Ionicons name="settings" size={20} color="#FFFFFF" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={handleUploadPress}>
+            <Ionicons name="add-circle" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Cover Photo */}
-        <View style={styles.coverPhotoContainer}>
+        <TouchableOpacity 
+          style={styles.coverPhotoContainer} 
+          onPress={() => isEditing && pickCoverPhoto()} 
+          activeOpacity={isEditing ? 0.9 : 1}
+          disabled={!isEditing}
+        >
           <Image source={{ uri: userData.coverPhoto }} style={styles.coverPhoto} />
           {isEditing && (
-            <TouchableOpacity style={styles.changeCoverButton}>
+            <View style={styles.changeCoverButton}>
               <Ionicons name="camera" size={20} color="#fff" />
               <Text style={styles.changeCoverText}>Change Cover</Text>
-            </TouchableOpacity>
+            </View>
           )}
-        </View>
+        </TouchableOpacity>
 
         {/* User Info Section */}
         <View style={styles.userInfoSection}>
@@ -260,9 +319,15 @@ export default function ProfileScreen() {
           </View>
           
           <View style={styles.profilePictureContainer}>
-            <Image source={{ uri: userData.avatar }} style={styles.profilePicture} />
+            <TouchableOpacity 
+              onPress={() => isEditing && pickProfilePicture()} 
+              activeOpacity={isEditing ? 0.9 : 1}
+              disabled={!isEditing}
+            >
+              <Image source={{ uri: userData.avatar }} style={styles.profilePicture} />
+            </TouchableOpacity>
             {isEditing && (
-              <TouchableOpacity style={styles.changePhotoButton}>
+              <TouchableOpacity style={styles.changePhotoButton} onPress={pickProfilePicture}>
                 <Ionicons name="camera" size={16} color="#fff" />
               </TouchableOpacity>
             )}
@@ -333,6 +398,111 @@ export default function ProfileScreen() {
         {/* Tab Content */}
         {renderTabContent()}
       </ScrollView>
+
+      {/* Upload Bottom Sheet Modal */}
+      <Modal
+        visible={showUploadModal}
+        transparent={true}
+        animationType="none"
+        onRequestClose={() => setShowUploadModal(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowUploadModal(false)}
+        >
+          <View style={[styles.bottomSheet, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.bottomSheetHandle} />
+            <Text style={styles.bottomSheetTitle}>Create</Text>
+            
+            <View style={styles.uploadOptions}>
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Story')}
+              >
+                <Ionicons name="book" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Story</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Photo')}
+              >
+                <Ionicons name="image" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Photo</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Reels')}
+              >
+                <Ionicons name="film" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Reels</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Video')}
+              >
+                <Ionicons name="videocam" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Video</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Live')}
+              >
+                <Ionicons name="radio" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Live</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.uploadOption}
+                onPress={() => handleUploadOptionPress('Song')}
+              >
+                <Ionicons name="musical-notes" size={24} color="#6A5ACD" />
+                <Text style={styles.uploadOptionText}>Song</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Upload Screens Modal */}
+      <Modal
+        visible={!!selectedUploadScreen}
+        animationType="none"
+        onRequestClose={() => setSelectedUploadScreen(null)}
+      >
+        <View style={styles.fullScreenUploadContainer}>
+          {/* Header with Close Button */}
+          <View style={styles.uploadModalHeader}>
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={() => setSelectedUploadScreen(null)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={28} color="#fff" />
+            </TouchableOpacity>
+            
+            <Text style={styles.uploadModalTitle}>
+              {selectedUploadScreen === 'Story' && 'Story Upload'}
+              {selectedUploadScreen === 'Photo' && 'Photo Upload'}
+              {selectedUploadScreen === 'Reels' && 'Reels Upload'}
+              {selectedUploadScreen === 'Video' && 'Video Upload'}
+              {selectedUploadScreen === 'Live' && 'Live Upload'}
+              {selectedUploadScreen === 'Song' && 'Song Upload'}
+            </Text>
+            
+            <View style={styles.placeholder} />
+          </View>
+          
+          {/* Upload Screen Content */}
+          <View style={styles.uploadScreenContainer}>
+            <Text style={styles.emptyText}>Upload functionality coming soon...</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -581,5 +751,83 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#666666',
+  },
+  // Upload Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  bottomSheet: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+  },
+  bottomSheetHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#666',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  bottomSheetTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  uploadOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 16,
+    paddingBottom: 20,
+  },
+  uploadOption: {
+    width: '30%',
+    alignItems: 'center',
+    paddingVertical: 16,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 12,
+  },
+  uploadOptionText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    marginTop: 8,
+  },
+  // Full Screen Upload Modal Styles
+  fullScreenUploadContainer: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+  uploadModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1A1A1A',
+  },
+  closeButton: {
+    padding: 8,
+  },
+  uploadModalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  placeholder: {
+    width: 44,
+  },
+  uploadScreenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

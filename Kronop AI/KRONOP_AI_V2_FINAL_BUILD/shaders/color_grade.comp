@@ -1,0 +1,253 @@
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+layout(binding = 0) readonly buffer InputBuffer {
+    vec4 inputPixels[];
+};
+
+layout(binding = 1) writeonly buffer OutputBuffer {
+    vec4 outputPixels[];
+};
+
+layout(binding = 2) readonly buffer LUTBuffer {
+    vec4 lutData[];
+};
+
+layout(push_constant) uniform PushConstants {
+    int width;
+    int height;
+    float boostFactor;
+    int lutSize;
+    float vibrance;
+    float contrast;
+    float saturation;
+} pc;
+
+// Helper functions for color space conversions
+vec3 rgbToHSV(vec3 rgb) {
+    float maxVal = max(max(rgb.r, rgb.g), rgb.b);
+    float minVal = min(min(rgb.r, rgb.g), rgb.b);
+    float delta = maxVal - minVal;
+    
+    vec3 hsv;
+    hsv.b = maxVal;
+    
+    if (delta < 0.00001) {
+        hsv.r = 0.0;
+        hsv.g = 0.0;
+        return hsv;
+    }
+    
+    hsv.g = delta / maxVal;
+    
+    if (maxVal == rgb.r) {
+        hsv.r = 60.0 * ((rgb.g - rgb.b) / delta);
+        if (hsv.r < 0.0) hsv.r += 360.0;
+    } else if (maxVal == rgb.g) {
+        hsv.r = 60.0 * ((rgb.b - rgb.r) / delta + 2.0);
+    } else {
+        hsv.r = 60.0 * ((rgb.r - rgb.g) / delta + 4.0);
+    }
+    
+    return hsv;
+}
+
+vec3 hsvToRGB(vec3 hsv) {
+    float c = hsv.b * hsv.g;
+    float x = c * (1.0 - abs(mod(hsv.r / 60.0, 2.0) - 1.0));
+    float m = hsv.b - c;
+    
+    vec3 rgb;
+    
+    if (hsv.r >= 0.0 && hsv.r < 60.0) {
+        rgb = vec3(c, x, 0.0);
+    } else if (hsv.r >= 60.0 && hsv.r < 120.0) {
+        rgb = vec3(x, c, 0.0);
+    } else if (hsv.r >= 120.0 && hsv.r < 180.0) {
+        rgb = vec3(0.0, c, x);
+    } else if (hsv.r >= 180.0 && hsv.r < 240.0) {
+        rgb = vec3(0.0, x, c);
+    } else if (hsv.r >= 240.0 && hsv.r < 300.0) {
+        rgb = vec3(x, 0.0, c);
+    } else {
+        rgb = vec3(c, 0.0, x);
+    }
+    
+    return rgb + vec3(m);
+}
+
+// 3D LUT lookup with trilinear interpolation
+vec3 lookupLUT(vec3 color) {
+    // Normalize color to LUT coordinates
+    vec3 lutCoord = color * (float(pc.lutSize) - 1.0);
+    
+    // Get integer and fractional parts
+    ivec3 lutIndex = ivec3(floor(lutCoord));
+    vec3 lutFraction = lutCoord - vec3(lutIndex);
+    
+    // Clamp to valid range
+    lutIndex = clamp(lutIndex, ivec3(0), ivec3(pc.lutSize - 2));
+    
+    // Calculate 8 corners of the cube for trilinear interpolation
+    vec3 c000 = lutData[(lutIndex.z * pc.lutSize + lutIndex.y) * pc.lutSize + lutIndex.x].rgb;
+    vec3 c001 = lutData[(lutIndex.z * pc.lutSize + lutIndex.y) * pc.lutSize + lutIndex.x + 1].rgb;
+    vec3 c010 = lutData[(lutIndex.z * pc.lutSize + (lutIndex.y + 1)) * pc.lutSize + lutIndex.x].rgb;
+    vec3 c011 = lutData[(lutIndex.z * pc.lutSize + (lutIndex.y + 1)) * pc.lutSize + lutIndex.x + 1].rgb;
+    vec3 c100 = lutData[((lutIndex.z + 1) * pc.lutSize + lutIndex.y) * pc.lutSize + lutIndex.x].rgb;
+    vec3 c101 = lutData[((lutIndex.z + 1) * pc.lutSize + lutIndex.y) * pc.lutSize + lutIndex.x + 1].rgb;
+    vec3 c110 = lutData[((lutIndex.z + 1) * pc.lutSize + (lutIndex.y + 1)) * pc.lutSize + lutIndex.x].rgb;
+    vec3 c111 = lutData[((lutIndex.z + 1) * pc.lutSize + (lutIndex.y + 1)) * pc.lutSize + lutIndex.x + 1].rgb;
+    
+    // Trilinear interpolation
+    vec3 c00 = mix(c000, c001, lutFraction.x);
+    vec3 c01 = mix(c010, c011, lutFraction.x);
+    vec3 c10 = mix(c100, c101, lutFraction.x);
+    vec3 c11 = mix(c110, c111, lutFraction.x);
+    
+    vec3 c0 = mix(c00, c01, lutFraction.y);
+    vec3 c1 = mix(c10, c11, lutFraction.y);
+    
+    return mix(c0, c1, lutFraction.z);
+}
+
+// iPhone-style vibrance enhancement
+vec3 applyVibrance(vec3 color) {
+    vec3 hsv = rgbToHSV(color);
+    
+    // Vibrance enhancement - more effect on less saturated colors
+    float saturationBoost = 1.0 + (pc.vibrance - 1.0) * (1.0 - hsv.g);
+    hsv.g = clamp(hsv.g * saturationBoost, 0.0, 1.0);
+    
+    // Slight brightness adjustment
+    hsv.b = clamp(hsv.b * 1.02, 0.0, 1.0);
+    
+    // Enhance specific hues
+    if (hsv.r >= 0.0 && hsv.r <= 60.0) { // Reds to Yellows
+        hsv.g = clamp(hsv.g * 1.1, 0.0, 1.0);
+    } else if (hsv.r >= 180.0 && hsv.r <= 240.0) { // Cyans to Blues
+        hsv.g = clamp(hsv.g * 1.15, 0.0, 1.0);
+        hsv.b = clamp(hsv.b * 1.02, 0.0, 1.0);
+    } else if (hsv.r >= 90.0 && hsv.r <= 150.0) { // Greens to Cyans
+        hsv.g = clamp(hsv.g * 1.12, 0.0, 1.0);
+    }
+    
+    return hsvToRGB(hsv);
+}
+
+// Color boost function (40-60% enhancement)
+vec3 applyColorBoost(vec3 color) {
+    vec3 boosted;
+    
+    // Selective color boosting based on dominant channel
+    if (color.r > color.g && color.r > color.b) {
+        // Warm tones (reds/oranges)
+        boosted.r = clamp(color.r * pc.boostFactor, 0.0, 1.0);
+        boosted.g = clamp(color.g * pc.boostFactor * 0.8, 0.0, 1.0);
+        boosted.b = clamp(color.b * pc.boostFactor * 0.6, 0.0, 1.0);
+    } else if (color.b > color.r && color.b > color.g) {
+        // Cool tones (blues/cyans)
+        boosted.r = clamp(color.r * pc.boostFactor * 0.7, 0.0, 1.0);
+        boosted.g = clamp(color.g * pc.boostFactor * 0.9, 0.0, 1.0);
+        boosted.b = clamp(color.b * pc.boostFactor, 0.0, 1.0);
+    } else if (color.g > color.r && color.g > color.b) {
+        // Greens
+        boosted.r = clamp(color.r * pc.boostFactor * 0.8, 0.0, 1.0);
+        boosted.g = clamp(color.g * pc.boostFactor, 0.0, 1.0);
+        boosted.b = clamp(color.b * pc.boostFactor * 0.7, 0.0, 1.0);
+    } else {
+        // Neutral colors - balanced boost
+        boosted = color * pc.boostFactor;
+    }
+    
+    return boosted;
+}
+
+// Cinematic contrast and grading
+vec3 applyCinematicGrading(vec3 color) {
+    // Apply S-curve contrast
+    vec3 contrasted = pow((color - 0.5) * pc.contrast + 0.5, vec3(0.9));
+    
+    // Warm temperature shift
+    contrasted.r += 0.02;
+    contrasted.b -= 0.01;
+    
+    // Highlight roll-off
+    float rollOffPoint = 0.8;
+    contrasted.r = contrasted.r > rollOffPoint ? rollOffPoint + (contrasted.r - rollOffPoint) * 0.5 : contrasted.r;
+    contrasted.g = contrasted.g > rollOffPoint ? rollOffPoint + (contrasted.g - rollOffPoint) * 0.5 : contrasted.g;
+    contrasted.b = contrasted.b > rollOffPoint ? rollOffPoint + (contrasted.b - rollOffPoint) * 0.5 : contrasted.b;
+    
+    return clamp(contrasted, 0.0, 1.0);
+}
+
+// Saturation enhancement
+vec3 applySaturation(vec3 color) {
+    // Convert to YUV for better saturation control
+    float y = dot(color, vec3(0.299, 0.587, 0.114));
+    vec3 chroma = color - y;
+    
+    // Apply saturation
+    return y + chroma * pc.saturation;
+}
+
+// Skin tone preservation
+vec3 preserveSkinTones(vec3 original, vec3 enhanced) {
+    vec3 hsvOrig = rgbToHSV(original);
+    vec3 hsvEnh = rgbToHSV(enhanced);
+    
+    // Detect skin tones
+    if (hsvOrig.r >= 0.0 && hsvOrig.r <= 60.0 && 
+        hsvOrig.g >= 0.2 && hsvOrig.g <= 0.8 && 
+        hsvOrig.b >= 0.3 && hsvOrig.b <= 0.9) {
+        
+        // Preserve skin tones with subtle enhancement
+        hsvEnh.g = mix(hsvOrig.g, hsvEnh.g, 0.3); // 30% saturation change
+        hsvEnh.b = mix(hsvOrig.b, hsvEnh.b, 0.5); // 50% brightness change
+        
+        // Slight warmth adjustment
+        if (hsvEnh.r > 45.0) {
+            hsvEnh.r = mix(hsvOrig.r, hsvEnh.r, 0.2);
+        }
+        
+        return hsvToRGB(hsvEnh);
+    }
+    
+    return enhanced;
+}
+
+void main() {
+    ivec2 workGroup = ivec2(gl_WorkGroupID);
+    ivec2 localThread = ivec2(gl_LocalInvocationID);
+    ivec2 globalCoord = workGroup * ivec2(16) + localThread;
+    
+    if (globalCoord.x >= pc.width || globalCoord.y >= pc.height) {
+        return;
+    }
+    
+    int pixelIndex = globalCoord.y * pc.width + globalCoord.x;
+    vec4 originalPixel = inputPixels[pixelIndex];
+    
+    // Step 1: Apply 3D LUT lookup
+    vec3 lutColor = lookupLUT(originalPixel.rgb);
+    
+    // Step 2: Apply vibrance enhancement
+    vec3 vibrantColor = applyVibrance(lutColor);
+    
+    // Step 3: Apply color boost (40-60%)
+    vec3 boostedColor = applyColorBoost(vibrantColor);
+    
+    // Step 4: Apply saturation
+    vec3 saturatedColor = applySaturation(boostedColor);
+    
+    // Step 5: Apply cinematic grading
+    vec3 gradedColor = applyCinematicGrading(saturatedColor);
+    
+    // Step 6: Preserve skin tones
+    vec3 finalColor = preserveSkinTones(originalPixel.rgb, gradedColor);
+    
+    // Step 7: Gamma correction and output
+    finalColor = pow(finalColor, vec3(1.0/2.2));
+    
+    outputPixels[pixelIndex] = vec4(clamp(finalColor, 0.0, 1.0), originalPixel.a);
+}

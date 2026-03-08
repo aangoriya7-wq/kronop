@@ -566,7 +566,6 @@ export default function HomeScreen() {
           <HeaderButton icon="person-search" onPress={handleSearchPress} testID="search-btn" />
           <HeaderButton icon="chat-bubble" onPress={handleChatPress} testID="chat-btn" />
           <HeaderButton icon="music-note" onPress={handleMusicPress} testID="music-btn" />
-          <HeaderButton icon="add-circle" onPress={handleUploadPress} testID="upload-btn" />
         </View>
       </View>
 
