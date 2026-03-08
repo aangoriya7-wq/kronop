@@ -4,8 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import { StoryViewer } from '../../components/feature';
-import { StorySection } from '../../components/feature/StorySection';
+import { StoryViewer, StorySection } from '../../Apptepbar/Story';
 import { theme } from '../../constants/theme';
 import { useAlert } from '../../template';
 // import { Story } from '../../types/story'; // Removed - types folder deleted

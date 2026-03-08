@@ -18,11 +18,11 @@ import {
 
 } from 'react-native';
 
-import { SafeScreen } from '../../components/layout/SafeScreen';
+import { SafeScreen } from '../../../components/layout/SafeScreen';
 
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
-import { storiesApi } from '../../services/api';
+import { storiesApi } from '../../../services/api';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 

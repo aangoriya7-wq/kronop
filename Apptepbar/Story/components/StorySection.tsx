@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
-import { theme } from '../../constants/theme';
+import { theme } from '../../../constants/theme';
 // import { Story } from '../../types/story'; // Removed - types folder deleted
 
 // Define Story interface since types folder was deleted

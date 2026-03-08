@@ -12,8 +12,20 @@ import {
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
-import { theme } from '../../constants/theme';
-import { Story } from '../../types/story';
+import { theme } from '../../../constants/theme';
+
+// Local Story interface since types folder was deleted
+interface Story {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  duration?: number;
+  viewed: boolean;
+  timestamp: string;
+}
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
