@@ -32,8 +32,6 @@ const settingsData: SettingItem[] = [
   { id: 'SelfDestructChats', name: 'Self Destruct Chats', icon: 'timer-off', enabled: false },
   { id: 'ShakeToReport', name: 'Shake To Report', icon: 'report-problem', enabled: false },
   { id: 'StorageManager', name: 'Storage Manager', icon: 'storage', enabled: false },
-  { id: 'Logout', name: 'Logout', icon: 'logout', enabled: false },
-  { id: 'DeleteAccount', name: 'Delete Account', icon: 'delete', enabled: false },
 ];
 
 export default function SettingsScreen() {
@@ -68,9 +66,6 @@ export default function SettingsScreen() {
         <Text style={styles.settingName}>{setting.name}</Text>
       </View>
       
-      {setting.id === 'Logout' || setting.id === 'DeleteAccount' ? (
-        <MaterialIcons name="chevron-right" size={20} color="#666666" />
-      ) : (
         <TouchableOpacity 
           style={[styles.toggleButton, setting.enabled && styles.toggleButtonEnabled]}
           onPress={() => toggleSetting(setting.id)}
@@ -78,7 +73,6 @@ export default function SettingsScreen() {
         >
           <View style={[styles.toggleCircle, setting.enabled && styles.toggleCircleEnabled]} />
         </TouchableOpacity>
-      )}
     </TouchableOpacity>
   );
 

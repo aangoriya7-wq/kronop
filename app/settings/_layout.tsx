@@ -22,7 +22,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="InAppTranslator" />
       <Stack.Screen name="Language" />
       <Stack.Screen name="LinkedDevices" />
-      <Stack.Screen name="Logout" />
       <Stack.Screen name="Notifications" />
       <Stack.Screen name="OfflineVault" />
       <Stack.Screen name="Profile" />
@@ -31,7 +30,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="SelfDestructChats" />
       <Stack.Screen name="ShakeToReport" />
       <Stack.Screen name="StorageManager" />
-      <Stack.Screen name="DeleteAccount" />
     </Stack>
   );
 }

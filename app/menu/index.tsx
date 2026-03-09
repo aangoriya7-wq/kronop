@@ -29,34 +29,16 @@ export default function MenuScreen() {
       onPress: () => router.push('/menu/biometric'),
     },
     {
-      id: 'settings',
-      icon: 'settings' as const,
-      title: 'Settings',
-      onPress: () => router.push('/settings'),
-    },
-    {
-      id: 'verification',
-      icon: 'checkmark-circle' as const,
-      title: 'Verification',
-      onPress: () => router.push('/verification'),
-    },
-    {
-      id: 'support',
-      icon: 'headset' as const,
-      title: 'Support',
-      onPress: () => router.push('/help-center'),
+      id: 'blocked',
+      icon: 'shield-checkmark' as const,
+      title: 'Blocked Users',
+      onPress: () => router.push('/menu/blocked'),
     },
     {
       id: 'privacy',
       icon: 'lock-closed' as const,
       title: 'Privacy Policy',
       onPress: () => console.log('Privacy Policy pressed'),
-    },
-    {
-      id: 'terms',
-      icon: 'document-text' as const,
-      title: 'Terms of Service',
-      onPress: () => console.log('Terms of Service pressed'),
     },
     {
       id: 'about',
@@ -68,8 +50,15 @@ export default function MenuScreen() {
       id: 'logout',
       icon: 'log-out' as const,
       title: 'Logout',
-      onPress: () => console.log('Logout pressed'),
+      onPress: () => router.push('/menu/Logout'),
     },
+    {
+      id: 'delete-account',
+      icon: 'trash' as const,
+      title: 'Delete Account',
+      onPress: () => router.push('/menu/DeleteAccount'),
+    },
+
   ];
 
   return (
