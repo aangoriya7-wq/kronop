@@ -18,7 +18,7 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 
 const mockUserData = {
-  displayName: 'John Doe',
+  displayName: 'Aman Angoriya',
   username: 'johndoe',
   bio: 'Passionate about creating amazing content and connecting with people around the world.',
   avatar: 'https://picsum.photos/80/80?random=profile',

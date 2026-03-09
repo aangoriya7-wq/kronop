@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "kronop-app",
+  "main": "AppEntry.js",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "engines": {
@@ -169,6 +170,7 @@
     "react-native-stream": "^0.1.9",
     "react-native-super-grid": "^6.0.1",
     "react-native-svg": "15.12.1",
+    "react-native-track-player": "^4.1.2",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video-cache": "^2.7.4",

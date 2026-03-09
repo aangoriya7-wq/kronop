@@ -34,23 +34,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const initializeNativeComponents = async () => {
       try {
         // Initialize Turbo Bridge for hardware acceleration
-        // if (turboBridgeRef.current && !turboBridgeRef.current.isReady()) {
-        //   await turboBridgeRef.current.initialize();
-        // }
+        if (turboBridgeRef.current && !turboBridgeRef.current.isReady()) {
+          await turboBridgeRef.current.initialize();
+        }
 
         // Initialize NPU Controller for AI enhancement
-        // if (npuControllerRef.current) {
-        //   const npuReady = await npuControllerRef.current.initialize();
-        //   if (npuReady) {
-        //     setIsEnhanced(true);
-        //   }
-        // }
+        if (npuControllerRef.current) {
+          const npuReady = await npuControllerRef.current.initialize();
+          if (npuReady) {
+            setIsEnhanced(true);
+          }
+        }
       } catch (error) {
         // Silent fail
       }
     };
 
-    // initializeNativeComponents(); // Disabled to prevent crashes
+    initializeNativeComponents();
   }, []);
 
   // Enhanced video processing with NPU

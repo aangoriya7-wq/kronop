@@ -18,7 +18,6 @@ interface Photo {
   likes: number;
 }
 // import { getPhotosByCategory, getRelatedPhotos, photoCategories } from '../../services/photoService'; // Removed - services folder deleted
-import CustomDiamondIcon from '../../components/icons/CustomDiamondIcon';
 
 const { width, height } = Dimensions.get('window');
 
@@ -98,7 +97,7 @@ export default function CategoryDetailScreen() {
         </View>
         <View style={styles.photoActions}>
           <TouchableOpacity style={styles.actionButton}>
-            <CustomDiamondIcon size={24} color="#fff" />
+            <MaterialIcons name="favorite" size={24} color="#fff" />
             <Text style={styles.actionText}>{item.likes.toLocaleString()}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>

@@ -242,7 +242,27 @@ export default function RootLayout() {
               />
 
               <Stack.Screen 
+                name="search-user" 
+                options={{ 
+                  headerShown: false,
+                  animation: 'none',
+                  presentation: 'modal',
+                  contentStyle: { backgroundColor: '#000' }
+                }} 
+              />
+
+              <Stack.Screen 
                 name="songs" 
+                options={{ 
+                  headerShown: false,
+                  animation: 'none',
+                  presentation: 'modal',
+                  contentStyle: { backgroundColor: '#000' }
+                }} 
+              />
+
+              <Stack.Screen 
+                name="music" 
                 options={{ 
                   headerShown: false,
                   animation: 'none',

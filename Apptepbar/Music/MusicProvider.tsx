@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { View } from 'react-native';
 import MusicBar from './layout/MusicBar';
-import { setupPlayer, addTrack, play, pause, getState } from './player/MusicEngine';
 
 interface CurrentSong {
   artist: string;
@@ -35,25 +34,40 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializePlayer = async () => {
-      await setupPlayer();
+      try {
+        const { setupPlayer } = await import('./player/MusicEngine');
+        await setupPlayer();
+      } catch (error) {
+        console.error('Error setting up player:', error);
+      }
     };
     initializePlayer();
   }, []);
 
   const playSong = async (url: string, artist: string, title: string) => {
-    await addTrack(url, title, artist);
-    await play();
-    setCurrentSong({ artist, title, url });
-    setIsPlaying(true);
+    try {
+      const { addTrack, play } = await import('./player/MusicEngine');
+      await addTrack(url, title, artist);
+      await play();
+      setCurrentSong({ artist, title, url });
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Error playing song:', error);
+    }
   };
 
   const togglePlayPause = async () => {
-    if (isPlaying) {
-      await pause();
-      setIsPlaying(false);
-    } else {
-      await play();
-      setIsPlaying(true);
+    try {
+      const { pause, play } = await import('./player/MusicEngine');
+      if (isPlaying) {
+        await pause();
+        setIsPlaying(false);
+      } else {
+        await play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error toggling play/pause:', error);
     }
   };
 
